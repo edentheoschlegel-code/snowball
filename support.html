@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Help — My Snowball</title>
+<meta name="description" content="Get help with My Snowball: contact support and find answers about backups, Pro purchases, restores, and refunds.">
+<link rel="canonical" href="https://mysnowballapp.com/support.html">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<script>try{var n=(window.Capacitor&&typeof window.Capacitor.isNativePlatform==='function'&&window.Capacitor.isNativePlatform())||location.protocol==='capacitor:'||location.hostname==='localhost'||/[?&]native=1/.test(location.search);if(n)document.documentElement.className+=' native';}catch(e){}</script>
+<style>
+  /* Platform-aware payment/refund copy: web shows Stripe + email-us; the iOS app shows Apple refunds. */
+  .only-ios { display: none; }
+  html.native .only-web { display: none; }
+  html.native .only-ios { display: block; }
+  :root {
+    --brand: #0e7490; --brand-dark: #155e75; --brand-soft: #ecfeff;
+    --ink: #1a1a2e; --muted: #6b7280; --line: #e7e8ee; --bg: #f7f7fb; --card: #ffffff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--ink); background: var(--bg); margin: 0; line-height: 1.6;
+  }
+  .topbar {
+    padding: max(18px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) 18px max(24px, env(safe-area-inset-left));
+    border-bottom: 1px solid var(--line); background: rgba(255,255,255,.85);
+    backdrop-filter: saturate(180%) blur(12px); position: sticky; top: 0;
+  }
+  .topbar a { color: var(--ink); text-decoration: none; font-weight: 800; font-size: 17px; letter-spacing: -.3px; }
+  main { max-width: 680px; margin: 0 auto; padding: 40px 24px 80px; }
+  h1 { font-size: 30px; letter-spacing: -.5px; margin: 0 0 6px; }
+  .sub { color: var(--muted); font-size: 15.5px; margin-bottom: 28px; }
+  h2 { font-size: 19px; margin: 34px 0 10px; }
+  p, li { color: #333; font-size: 15.5px; }
+  ul { padding-left: 22px; }
+  a { color: var(--brand); }
+  code {
+    background: var(--brand-soft); color: var(--brand-dark);
+    padding: 2px 6px; border-radius: 5px; font-size: 13.5px;
+    font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1;
+  }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 18px 22px; margin: 20px 0;
+  }
+  .btn {
+    display: inline-block; background: var(--brand); color: #fff; font-weight: 700;
+    padding: 11px 20px; border-radius: 10px; margin-top: 6px; text-decoration: none;
+  }
+  .copy-addr {
+    display: block; background: none; border: none; padding: 0; margin-top: 10px;
+    color: var(--muted); font-family: inherit; font-size: 13.5px;
+    text-decoration: underline; text-underline-offset: 2px; cursor: pointer;
+  }
+  /* Dark mode — this standalone page has no theme toggle, so the OS preference
+     alone drives it. Tokens match the app's [data-theme="dark"] palette; solid
+     buttons take a dark ink since --brand becomes a light cyan (contrast). */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --brand: #22c3e6; --brand-dark: #7fe3f6; --brand-soft: #12303a;
+      --ink: #e8e8ed; --muted: #9aa2b1; --line: #2c2e37; --bg: #15161a; --card: #1c1d22;
+    }
+    .topbar { background: rgba(21,22,26,.85); }
+    p, li { color: #c9cdd6; }
+    .btn { color: #06232b; }
+  }
+</style>
+</head>
+<body>
+  <div class="topbar"><a href="./">← My Snowball</a></div>
+  <main>
+    <h1>Help</h1>
+    <p class="sub">Questions, bug reports, or feature requests — here's how to reach us.</p>
+    <p class="sub" style="font-size:13.5px">Last updated: July 16, 2026</p>
+
+    <div class="card">
+      <h2 style="margin-top:0">Contact</h2>
+      <p>Email <strong>support@mysnowballapp.com</strong> and we'll get back to you.</p>
+      <a class="btn" href="mailto:support@mysnowballapp.com">Email support</a>
+      <button type="button" class="copy-addr" onclick="copyAddress(this)">Copy address</button>
+    </div>
+
+    <h2>Common questions</h2>
+
+    <p><strong>Will my debts sync to my other devices?</strong><br>
+    No — by design. My Snowball stores everything only on the device you're using, with no account and no cloud sync. To move your plan to another device, use <strong>Back up your data</strong> in the footer to save a file, then <strong>Restore from backup</strong> on the other device.</p>
+
+    <p><strong>I deleted the app / cleared my browser data — can I get my plan back?</strong><br>
+    Only from a backup you made yourself. Since nothing is ever uploaded, there's no copy on our end to restore from. If you saved a backup file (footer → <strong>Back up your data</strong>), you can import it with <strong>Restore from backup</strong>. This is the tradeoff for full privacy — see the <a href="privacy.html">Privacy Policy</a> for details.</p>
+
+    <p><strong>What's the difference between snowball and avalanche?</strong><br>
+    <strong>Snowball</strong> pays your smallest balance first — quick wins that build momentum. <strong>Avalanche</strong> pays your highest interest rate first — mathematically the cheapest. My Snowball shows you both and tells you how much interest or time switching would save, so you can pick what fits you.</p>
+
+    <p><strong>Is there a paid plan?</strong><br>
+    My Snowball is free to use — plan up to four debts, compare strategies, run the "reach a debt-free date" goal-seek, and use the "what if I paid extra?" slider at no cost. There's an optional <strong>Pro</strong> unlock: a <strong>one-time $9.99 purchase</strong> (not a subscription) that adds <strong>unlimited debts</strong>, <strong>PDF export of your full payoff plan</strong>, and the <strong>refinance &amp; balance-transfer modeler</strong> — plus extras like intro-rate tracking, a goal photo, and your payoff story.</p>
+    <p class="only-web">Checkout is handled securely by Stripe (via RevenueCat) — the processor only ever sees the email for your receipt and your payment method, never your debts or plan. Pro comes with a <strong>30-day money-back guarantee</strong>: if it's not for you, email <a href="mailto:support@mysnowballapp.com">support@mysnowballapp.com</a> within 30 days for a full refund. Once approved, your refund takes about <strong>5–10 business days</strong> to appear on your statement.</p>
+    <p class="only-ios">On iPhone and iPad, checkout is handled by <strong>Apple</strong> through the App Store — we never see your card, name, or email. If Pro isn't for you, you can <strong>request a refund from Apple</strong> at <a href="https://reportaproblem.apple.com" target="_blank" rel="noopener">reportaproblem.apple.com</a>; Apple reviews and processes it.</p>
+
+    <p><strong>How do I get Pro back on a new device?</strong></p>
+    <p class="only-web">When you unlock Pro, you're given a one-time <strong>restore code</strong> (and a license card you can download or screenshot). Since there are no accounts, that code is how you re-unlock Pro in another browser — just keep it somewhere safe, along with your Stripe receipt email as proof of purchase. In the new browser, use <strong>Already bought Pro? Restore with a code</strong> in the footer. The iPhone and iPad app sells Pro separately through the App Store. Lost your code? Email <a href="mailto:support@mysnowballapp.com">support@mysnowballapp.com</a> and we'll help.</p>
+    <p class="only-ios">On iPhone and iPad there's no code to keep track of — Pro comes back through Apple. Tap <strong>Restore Purchases</strong> in the app and it re-unlocks on any device signed in with your Apple Account; your Apple receipt is your proof of purchase.</p>
+
+    <p><strong>Does My Snowball work offline?</strong><br>
+    Yes, once loaded. There's no server it depends on for day-to-day use — all the planning math runs on your device.</p>
+
+    <h2>Request a refund</h2>
+    <div class="card">
+      <div class="only-web">
+      <p style="margin-top:0">My Snowball Pro comes with a <strong>30-day money-back guarantee</strong>. Email us and a real person reviews it — no forms, no runaround. Once approved, your refund goes back to your original payment method and takes about 5–10 business days to appear on your statement.</p>
+      <p>To help us find your purchase, please paste your <strong>restore code</strong> and the <strong>email on your Stripe receipt</strong> in the message.</p>
+      <a class="btn" href="mailto:support@mysnowballapp.com?subject=Refund%20request%20%E2%80%94%20My%20Snowball%20Pro&body=Hi%20My%20Snowball%20team%2C%0A%0AI'd%20like%20to%20request%20a%20refund%20for%20my%20Pro%20purchase.%0A%0AMy%20restore%20code%3A%20%0AEmail%20on%20my%20Stripe%20receipt%3A%20%0AReason%20(optional)%3A%20%0A%0AThanks!%0A">Request a refund</a>
+      </div>
+      <div class="only-ios">
+      <p style="margin-top:0"><strong>Refunds on iPhone &amp; iPad are handled by Apple.</strong> Apple manages all App Store purchases, so refund requests go directly to Apple — it's quick, and Apple reviews and processes it.</p>
+      <a class="btn" href="https://reportaproblem.apple.com" target="_blank" rel="noopener">Request a refund from Apple</a>
+      </div>
+    </div>
+
+    <h2>Something not covered here?</h2>
+    <p>Email <a href="mailto:support@mysnowballapp.com">support@mysnowballapp.com</a> — happy to help.</p>
+  </main>
+<script>
+function copyAddress(btn) {
+  var addr = 'support@mysnowballapp.com';
+  function done() {
+    btn.textContent = 'Copied';
+    setTimeout(function () { btn.textContent = 'Copy address'; }, 2000);
+  }
+  function fallback() { window.prompt('Copy the address:', addr); }
+  try {
+    navigator.clipboard.writeText(addr).then(done, fallback);
+  } catch (e) {
+    fallback();
+  }
+}
+</script>
+</body>
+</html>

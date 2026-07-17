@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://js.stripe.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://da08ctfrofx1b.cloudfront.net; font-src 'self'; connect-src 'self' https://api.revenuecat.com https://e.revenue.cat https://js.stripe.com; worker-src 'self' blob:; frame-src https://js.stripe.com; child-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>My Snowball — Private Debt Payoff Planner</title>
+  <meta name="description" content="Plan your debt-free date with the snowball or avalanche method, entirely in your browser. Your balances, rates, and payments never leave your device — no account, no subscriptions.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="canonical" href="https://mysnowballapp.com/">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0f1115" media="(prefers-color-scheme: dark)">
+  <link rel="manifest" href="assets/manifest.webmanifest">
+  <!-- Open Graph / social share -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="My Snowball">
+  <meta property="og:url" content="https://mysnowballapp.com/">
+  <meta property="og:title" content="My Snowball — See your debt-free date, privately">
+  <meta property="og:description" content="Plan your debt-free date with the snowball or avalanche method, entirely in your browser. Your balances, rates, and payments never leave your device — no account, no subscriptions.">
+  <meta property="og:image" content="https://mysnowballapp.com/assets/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="My Snowball — 100% private, on your device">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="My Snowball — See your debt-free date, privately">
+  <meta name="twitter:description" content="Plan your debt-free date with the snowball or avalanche method, entirely in your browser. Your balances, rates, and payments never leave your device — no account, no subscriptions.">
+  <meta name="twitter:image" content="https://mysnowballapp.com/assets/og-image.png">
+  <!-- Sets data-theme before first paint (no light→dark flash). External file
+       so it satisfies the strict CSP's script-src 'self' (inline is blocked). -->
+  <script src="theme-init.js?v=49b5e9ed0a"></script>
+  <link rel="stylesheet" href="styles.css?v=49b5e9ed0a">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"My Snowball","url":"https://mysnowballapp.com/","description":"Plan your debt-free date with the snowball or avalanche method, entirely in your browser. Your balances, rates, and payments never leave your device — no account, no subscriptions.","applicationCategory":"FinanceApplication","operatingSystem":"Web browser","isAccessibleForFree":true,"browserRequirements":"Requires JavaScript. Runs entirely in the browser — no account, no upload.","publisher":{"@type":"Organization","name":"My Snowball"}}</script>
+</head>
+<body>
+  <a class="skip-link" href="#mainContent">Skip to content</a>
+  <div class="topbar">
+    <div class="logo" id="logo" role="button" tabindex="0" aria-label="Scroll to top">
+      <!-- Brand mark = the app icon (matches the Pro checkout + App Store icon). -->
+      <img class="brand-logo" src="assets/brand-mark-96.png" width="30" height="30" alt="My Snowball logo" />
+      <b class="wordmark">My Snow<span>ball</span></b>
+    </div>
+    <div class="topbar-right">
+      <div class="privacy-pill">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span class="pill-long">Your debt profile never leaves your device</span><span class="pill-short">Never leaves your device</span>
+      </div>
+      <button type="button" id="themeToggle" class="theme-toggle" aria-label="Switch theme">
+        <svg class="icon-moon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <svg class="icon-sun" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="shell">
+    <aside class="sidebar" aria-label="Primary">
+      <nav class="side-nav" id="sideNav" aria-label="Sections">
+        <a href="#/plan" class="side-link" id="navPlan" data-route="plan">
+          <span class="side-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9.5a.5.5 0 0 0 .5.5H10v-6h4v6h4.5a.5.5 0 0 0 .5-.5V10"/></svg></span>
+          <span class="side-link-text">Plan</span>
+        </a>
+        <a href="#/payoff" class="side-link" id="navPayoff" data-route="payoff">
+          <span class="side-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 16l3.5-4.5L14 14l4-6"/></svg></span>
+          <span class="side-link-text">Payoff Plan</span>
+        </a>
+        <a href="#/settings" class="side-link" id="navSettings" data-route="settings">
+          <span class="side-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v2.5M12 19v2.5M4.6 4.6 6.4 6.4M17.6 17.6l1.8 1.8M2.5 12H5M19 12h2.5M4.6 19.4 6.4 17.6M17.6 6.4l1.8-1.8"/></svg></span>
+          <span class="side-link-text">Settings</span>
+        </a>
+      </nav>
+      <button type="button" class="side-pro" id="sideProCard" hidden aria-label="Unlock My Snowball Pro — $9.99 one-time">
+        <span class="side-pro-head">
+          <span class="side-pro-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l4.5 3.5L12 5l4.5 6.5L21 8l-1.6 10.2a1 1 0 0 1-1 .8H5.6a1 1 0 0 1-1-.8L3 8z"/></svg></span>
+          <span class="side-pro-title">Unlock Pro</span>
+        </span>
+        <span class="side-pro-benefit">Plan unlimited debts + export your payoff-plan PDF</span>
+        <!-- Visual "Unlock now" affordance — a styled span, NOT a nested button
+             (the whole card is the button; a real nested button would be invalid
+             markup). Click/Enter/Space on the card opens the paywall unchanged. -->
+        <span class="side-pro-cta" aria-hidden="true">Unlock now</span>
+        <span class="side-pro-price">$9.99 · one-time</span>
+      </button>
+      <div class="side-privacy">
+        <div class="side-privacy-head">
+          <span class="side-privacy-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></span>
+          <span class="side-privacy-title">100% Private</span>
+        </div>
+        <p class="side-privacy-text">Your balances, rates, and payments never leave this device. No account, no upload, nothing tracked.</p>
+        <!-- Decorative padlock motif — reinforces the on-device promise. -->
+        <svg class="side-privacy-lock" aria-hidden="true" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+          <rect class="spl-body" x="12" y="21" width="24" height="18" rx="4"/>
+          <path class="spl-shackle" d="M17 21 v-4 a7 7 0 0 1 14 0 v4" fill="none" stroke-width="3.2" stroke-linecap="round"/>
+          <circle class="spl-hole" cx="24" cy="29" r="2.6"/>
+          <path class="spl-hole" d="M24 30.5 v4" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+        </svg>
+      </div>
+    </aside>
+
+    <main class="main-col" id="mainContent" tabindex="-1">
+      <div class="hero" id="routeHero">
+        <!-- Decorative snowy-mountain scene + friendly snowball mascot. 100%
+             inline SVG (no raster, no network). aria-hidden so it's skipped by
+             AT; sits behind the headline text and never reduces its contrast.
+             The h1/p below are the only nodes the router rewrites per route —
+             this scene is a sibling, so it persists across route changes. -->
+        <div class="hero-scene" aria-hidden="true">
+          <svg class="hero-mountains" viewBox="0 0 640 220" preserveAspectRatio="xMaxYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <!-- soft atmospheric blur for the far range → depth, not hard edges -->
+              <filter class="hs-soften" id="hsSoften" x="-10%" y="-10%" width="120%" height="120%">
+                <feGaussianBlur stdDeviation="2.2"/>
+              </filter>
+            </defs>
+            <!-- far, hazy ridge (blurred, low-contrast → recedes) -->
+            <g class="hs-far-group" filter="url(#hsSoften)">
+              <path class="hs-ridge-far" d="M280 220 L372 108 L420 142 L490 84 L556 130 L640 78 L640 220 Z"/>
+              <path class="hs-ridge-far2" d="M320 220 L408 118 L452 150 L520 100 L588 140 L640 106 L640 220 Z"/>
+            </g>
+            <!-- mid peaks with snow caps (crisp, foreground) -->
+            <path class="hs-peak" d="M330 220 L430 76 L470 118 L516 64 L560 110 L620 54 L640 76 L640 220 Z"/>
+            <path class="hs-snowcap" d="M430 76 L448 102 L440 106 L456 118 L470 118 L452 94 Z"/>
+            <path class="hs-snowcap" d="M516 64 L534 90 L526 94 L542 106 L556 106 L538 84 Z"/>
+            <path class="hs-snowcap" d="M620 54 L634 72 L640 76 L640 98 L628 80 Z"/>
+            <!-- near snow bank -->
+            <path class="hs-bank" d="M300 220 Q420 178 520 192 Q600 202 640 180 L640 220 Z"/>
+            <!-- falling-snow specks (decorative, atmospheric) -->
+            <g class="hs-snowfall">
+              <circle cx="360" cy="60" r="2"/><circle cx="404" cy="40" r="1.5"/>
+              <circle cx="448" cy="96" r="1.6"/><circle cx="492" cy="52" r="2.1"/>
+              <circle cx="536" cy="86" r="1.4"/><circle cx="588" cy="46" r="1.8"/>
+              <circle cx="616" cy="106" r="1.5"/><circle cx="380" cy="118" r="1.4"/>
+              <circle cx="560" cy="140" r="1.6"/><circle cx="624" cy="150" r="1.3"/>
+            </g>
+          </svg>
+          <!-- Snowball mascot: a soft, dimensional snowball character (mockup
+               harvest). Radial white→pale-blue body with an inner-shade arc for
+               roundness, top highlight crescent, angled brows, oval pupils with
+               catch-lights, a warm open smile, gentle cheeks, and snow-texture
+               specks. Gradients are declared inline so it's 100% on-device. -->
+          <svg class="hero-mascot" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient class="hm-body-grad" id="hmBody" cx="42%" cy="34%" r="72%">
+                <stop offset="0%" class="hm-grad-hi"/>
+                <stop offset="58%" class="hm-grad-mid"/>
+                <stop offset="100%" class="hm-grad-lo"/>
+              </radialGradient>
+              <!-- Soft inner shadow: gives the ball real interior depth (a gentle
+                   darkening that hugs the lower-right rim from the inside) rather
+                   than reading as a flat disc. Pure SVG filter, on-device. -->
+              <filter class="hm-inner" id="hmInner" x="-20%" y="-20%" width="140%" height="140%">
+                <feOffset dx="0" dy="3" in="SourceAlpha" result="off"/>
+                <feGaussianBlur in="off" stdDeviation="4" result="blur"/>
+                <feComposite in="SourceAlpha" in2="blur" operator="out" result="inner"/>
+                <feColorMatrix in="inner" type="matrix"
+                  values="0 0 0 0 0.36  0 0 0 0 0.56  0 0 0 0 0.67  0 0 0 0.55 0" result="tint"/>
+                <feComposite in="tint" in2="SourceGraphic" operator="in"/>
+              </filter>
+            </defs>
+            <ellipse class="hm-shadow" cx="60" cy="105" rx="33" ry="7"/>
+            <circle class="hm-body" cx="60" cy="58" r="42" fill="url(#hmBody)"/>
+            <!-- inner-shadow overlay for interior dimension -->
+            <circle class="hm-inner-shade" cx="60" cy="58" r="42" fill="url(#hmBody)"/>
+            <!-- roundness: lower-right inner shade + soft occlusion rim -->
+            <path class="hm-body-shade" d="M99 66 A42 42 0 0 1 41 96 A42 42 0 0 0 99 66 Z"/>
+            <!-- top highlight crescent -->
+            <path class="hm-shine" d="M34 40 A38 38 0 0 1 78 28 A30 30 0 0 0 34 40 Z"/>
+            <!-- surface snow-texture specks -->
+            <circle class="hm-fleck" cx="40" cy="34" r="1.5"/>
+            <circle class="hm-fleck" cx="76" cy="44" r="1.3"/>
+            <circle class="hm-fleck" cx="52" cy="24" r="1.1"/>
+            <circle class="hm-fleck" cx="86" cy="66" r="1.4"/>
+            <circle class="hm-fleck" cx="34" cy="70" r="1.2"/>
+            <!-- soft cheeks -->
+            <ellipse class="hm-cheek" cx="41" cy="66" rx="6.5" ry="4.6"/>
+            <ellipse class="hm-cheek" cx="79" cy="66" rx="6.5" ry="4.6"/>
+            <!-- angled brows -->
+            <path class="hm-brow" d="M42 47 Q49 43.5 55.5 47" fill="none" stroke-width="2.6" stroke-linecap="round"/>
+            <path class="hm-brow" d="M64.5 47 Q71 43.5 78 47" fill="none" stroke-width="2.6" stroke-linecap="round"/>
+            <!-- oval pupils with a big + small catch-light each -->
+            <ellipse class="hm-eye" cx="49" cy="57" rx="4.6" ry="5.8"/>
+            <ellipse class="hm-eye" cx="71" cy="57" rx="4.6" ry="5.8"/>
+            <circle class="hm-eye-spark" cx="50.8" cy="54.6" r="1.8"/>
+            <circle class="hm-eye-spark" cx="72.8" cy="54.6" r="1.8"/>
+            <circle class="hm-eye-spark hm-spark-sm" cx="47.6" cy="59" r=".9"/>
+            <circle class="hm-eye-spark hm-spark-sm" cx="69.6" cy="59" r=".9"/>
+            <!-- warm open smile: filled mouth + tongue -->
+            <path class="hm-mouth" d="M50 69 Q60 82 70 69 Q60 74 50 69 Z"/>
+            <path class="hm-tongue" d="M53.5 72.4 Q60 79 66.5 72.4 Q60 75.4 53.5 72.4 Z"/>
+            <!-- brand sparkle -->
+            <path class="hm-sparkle" d="M97 28 l2.2 5.6 5.6 2.2 -5.6 2.2 -2.2 5.6 -2.2 -5.6 -5.6 -2.2 5.6 -2.2 Z"/>
+          </svg>
+        </div>
+        <h1>See your <span class="accent">debt-free date</span>, today</h1>
+        <p>Add your balances, pick a strategy, watch the payoff plan build — no account, no upload, nothing tracked.</p>
+      </div>
+
+      <div id="app" class="app"></div>
+    </main>
+  </div>
+
+  <footer>
+    My Snowball — a private, in-browser debt payoff planner. Your data stays on your device.
+    <div class="footer-legal" style="margin-top: 10px;"><a href="privacy.html">Privacy</a> · <a href="https://edenapps.app/terms.html" target="_blank" rel="noopener">Terms</a> · <a href="support.html">Help</a></div>
+    <button type="button" id="footerRestoreLink" class="restore-link" style="margin-top: 8px;">Already bought Pro? Restore with a code</button>
+    <button type="button" id="footerLicenseLink" class="restore-link" hidden>View your Pro license card</button>
+    <button type="button" id="footerRefundLink" class="restore-link" hidden>Need a refund?</button>
+    <div class="footer-tools">
+      <button type="button" id="footerBackupLink" class="restore-link">Back up your data</button>
+      <span class="footer-tools-sep" aria-hidden="true">·</span>
+      <button type="button" id="footerImportLink" class="restore-link">Restore from backup</button>
+      <input type="file" id="vaultFileInput" accept=".json,application/json" hidden>
+    </div>
+    <div class="footer-byline">
+      An Eden Apps app
+      <span class="footer-tools-sep" aria-hidden="true">·</span>
+      <a href="https://edenapps.app" target="_blank" rel="noopener">edenapps.app</a>
+    </div>
+  </footer>
+
+  <!-- pdf-lib is lazy-loaded on first PDF export (see ensurePdfLib in app.js) -->
+  <script src="billing.js?v=49b5e9ed0a"></script>
+  <script src="app.js?v=49b5e9ed0a"></script>
+</body>
+</html>
