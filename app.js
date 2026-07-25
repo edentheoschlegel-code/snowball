@@ -907,7 +907,11 @@ function showLicenseCardModal() {
 // this page load — deliberately, since an unsaved code is a ticking loss.
 function maybeShowSaveNag() {
   if (IS_NATIVE) return; // iOS has no restore CODE / license card to save — Apple restore covers cross-device
-  if (!Billing.getRestoreCode()) return;
+  // Guarded like the isPro() read below: this runs at top level during boot, so an
+  // unguarded throw here would stop every later top-level statement — including the
+  // service-worker registration and the ?restore= deep-link guard.
+  let savedCode = null; try { savedCode = Billing.getRestoreCode(); } catch (e) { savedCode = null; }
+  if (!savedCode) return;
   // Only nag to "save your Pro license card" when this browser is ACTUALLY Pro.
   // A stored code alone isn't enough: a refunded/expired/hollow code leaves a
   // stale code in localStorage, and showing "Keep Pro safe" next to the Unlock-Pro
@@ -943,7 +947,10 @@ function maybeShowSelfHealNag() {
   let isPro = false;
   try { isPro = Billing.isPro(); } catch (e) { isPro = false; }
   if (!isPro) return;
-  if (Billing.getRestoreCode()) return; // has a code — the save-card nag covers it
+  // Guarded like the isPro() read above — this runs during boot via the entitlement
+  // check, and an unguarded throw would stop the top-level statements after it.
+  let heldCode = null; try { heldCode = Billing.getRestoreCode(); } catch (e) { heldCode = null; }
+  if (heldCode) return; // has a code — the save-card nag covers it
   if ($("#saveNagBanner")) return;
   const bar = el("div", "save-nag"); bar.id = "saveNagBanner";
   bar.appendChild(txt("span", "save-nag-text", "You're Pro on this browser — create your restore code so you can unlock other devices too."));
@@ -978,7 +985,11 @@ function updateLicenseFooterLink() {
     // browser shouldn't be pointed at a "your key back into Pro" card for a dead code. isPro()
     // is re-evaluated via refreshAfterProChange after the boot check (offline owners fail OPEN).
     let pro = false; try { pro = Billing.isPro(); } catch (e) { pro = false; }
-    link.hidden = !(Billing.getRestoreCode() && pro);
+    // getRestoreCode() guarded too: buildApp() calls this at top level during boot,
+    // so an unguarded throw stopped every later top-level statement — including the
+    // service worker and the ?restore= deep-link guard.
+    let savedCode = null; try { savedCode = Billing.getRestoreCode(); } catch (e) { savedCode = null; }
+    link.hidden = !(savedCode && pro);
   }
 }
 
@@ -5629,7 +5640,7 @@ if (!ROUTES.some((r) => location.hash === "#/" + r)) {
   // replace (not push) so the normalized default doesn't add a history entry.
   try { history.replaceState(null, "", "#/" + DEFAULT_ROUTE); } catch (e) { location.hash = "#/" + DEFAULT_ROUTE; }
 }
-buildApp();
+try { buildApp(); } catch (e) {}
 // Boot entitlement check. Billing.shouldCheckAtBoot() returns true only when this
 // browser might already own Pro (a stored restore code, a verified-before "owner"
 // flag, or an attempted-but-stranded purchase). A brand-new visitor returns false,
@@ -5688,12 +5699,14 @@ if (IS_NATIVE) {
 }
 $("#footerLicenseLink").onclick = () => showLicenseCardModal();
 $("#footerRefundLink").onclick = () => showRefundModal();
-updateRefundFooterLink();
-updateSideProCard();
+// Wrapped exactly as refreshAfterProChange() already wraps these same calls: a
+// billing/DOM fault in any one of them must not halt the rest of boot below.
+try { updateRefundFooterLink(); } catch (e) {}
+try { updateSideProCard(); } catch (e) {}
 // If this browser is already known-Pro on the synchronous fast path (a verified
 // owner from a prior session), record it now so a future verified revocation is
 // recognizable even if no refresh runs this session.
-markWasProIfActive();
+try { markWasProIfActive(); } catch (e) {}
 $("#footerBackupLink").onclick = () => exportVault();
 const vaultInput = $("#vaultFileInput");
 $("#footerImportLink").onclick = () => vaultInput.click();
@@ -5702,7 +5715,7 @@ vaultInput.addEventListener("change", () => {
   vaultInput.value = ""; // so re-picking the same file re-fires change
   importVault(f);
 });
-maybeShowSaveNag();
+try { maybeShowSaveNag(); } catch (e) {}
 
 
 /* Offline support (progressive enhancement): register the service worker ONLY
