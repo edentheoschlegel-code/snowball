@@ -2953,7 +2953,7 @@ function buildSettingsView() {
   // always USD); web keeps the literal "$9.99". Falls back to "$9.99" until fetched.
   const checkPriceLine = (IS_NATIVE ? nativePriceOr("$9.99") : "$9.99") + " once — never a subscription";
   [
-    "100% on this device",
+    "Stored only on this device",
     "No account, no uploads — ever",
     "No bank link · no ads · no tracking",
     checkPriceLine,
@@ -5730,19 +5730,51 @@ maybeShowSaveNag();
   if (!code || !code.trim()) return;
   try { history.replaceState(null, "", location.pathname + location.hash); } catch (e) {}
   const normalized = formatRestoreCodeInput(code);
-  let res;
-  try { res = await Billing.restoreWithCode(normalized); }
-  catch (e) { res = { ok: false }; }
-  if (res && res.ok) {
-    announce("Welcome back — Pro is unlocked on this device.", false);
-    showToast("Welcome back — Pro is unlocked on this device.");
-    refreshAfterProChange();
-    runPendingProIntent();
-  } else {
-    // Couldn't restore from the scan (offline, refunded, or an odd code) — open
-    // the restore modal prefilled so the user can see the code and retry.
-    showRestoreEntryModal();
-    const inp = document.querySelector(".restore-code-input");
-    if (inp) inp.value = normalized || String(code).trim();
+  const proceed = async () => {
+    let res;
+    try { res = await Billing.restoreWithCode(normalized); }
+    catch (e) { res = { ok: false }; }
+    if (res && res.ok) {
+      announce("Welcome back — Pro is unlocked on this device.", false);
+      showToast("Welcome back — Pro is unlocked on this device.");
+      refreshAfterProChange();
+      runPendingProIntent();
+    } else {
+      // Couldn't restore from the scan (offline, refunded, or an odd code) — open
+      // the restore modal prefilled so the user can see the code and retry.
+      showRestoreEntryModal();
+      const inp = document.querySelector(".restore-code-input");
+      if (inp) inp.value = normalized || String(code).trim();
+    }
+  };
+  // A successful restore ADOPTS the scanned identity: rememberIdentity() overwrites
+  // the stored code, and the boot nag stays quiet because code_ack is already set —
+  // so opening someone else's link would silently and permanently discard this
+  // device's own code. If a DIFFERENT code is already saved here, ask before
+  // switching. Re-scanning your own card (same code) stays one-step seamless.
+  let existing = null;
+  try { existing = Billing.getRestoreCode(); } catch (e) {}
+  if (existing && existing !== normalized) {
+    const backdrop = el("div", "modal-backdrop");
+    const modal = el("div", "modal pro-modal");
+    modal.appendChild(txt("h3", null, "Keep your current Pro code?"));
+    modal.appendChild(txt("p", "hint", "This device already has a Pro code saved:"));
+    const box = el("div", "restore-code-box");
+    box.appendChild(txt("div", "restore-code-value", existing));
+    modal.appendChild(box);
+    modal.appendChild(txt("p", "hint",
+      "The link you opened restores a different code. Switching replaces the code saved on this device — if you haven't saved your license card, the current code can't be recovered here."));
+    const keepBtn = txt("button", "btn big", "Keep my current code"); keepBtn.type = "button";
+    const switchBtn = txt("button", "btn ghost", "Switch to the new code"); switchBtn.type = "button";
+    const actions = el("div", "pro-actions"); actions.append(keepBtn, switchBtn);
+    modal.appendChild(actions);
+    backdrop.appendChild(modal);
+    document.body.appendChild(backdrop);
+    const a11y = makeModalAccessible(backdrop, modal, { escCloses: true });
+    keepBtn.onclick = () => a11y.close();
+    switchBtn.onclick = () => { a11y.close(); proceed(); };
+    backdrop.addEventListener("click", (e) => { if (e.target === backdrop) a11y.close(); });
+    return;
   }
+  await proceed();
 })();
