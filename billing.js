@@ -28037,6 +28037,24 @@ but received
     }
     return cachedProStatus;
   }
+  function isRealPrice(product) {
+    if (!product) return false;
+    const s = product.priceString;
+    if (typeof s !== "string" || !s) return false;
+    const n = product.price;
+    if (typeof n === "number" && Number.isFinite(n)) return n > 0;
+    const digits = s.replace(/\D/g, "");
+    return digits.length > 0 && /[1-9]/.test(digits);
+  }
+  function isZeroPriced(product) {
+    if (!product) return false;
+    const n = product.price;
+    if (typeof n === "number" && Number.isFinite(n)) return n <= 0;
+    const s = product.priceString;
+    if (typeof s !== "string" || !s) return false;
+    const digits = s.replace(/\D/g, "");
+    return digits.length > 0 && !/[1-9]/.test(digits);
+  }
   async function getNativeLocalizedPrice() {
     if (!IS_NATIVE) return null;
     try {
@@ -28045,8 +28063,8 @@ but received
         const offerings = await Purchases.getOfferings();
         const current = offerings && offerings.current;
         const pkg = current && current.lifetime || current && Array.isArray(current.availablePackages) && current.availablePackages[0] || null;
-        const s = pkg && pkg.product && pkg.product.priceString;
-        return typeof s === "string" && s ? s : null;
+        const product = pkg && pkg.product;
+        return isRealPrice(product) ? product.priceString : null;
       })();
       lookup.catch(() => {
       });
@@ -28067,6 +28085,11 @@ but received
         const pkg = offerings && offerings.current && offerings.current.lifetime;
         if (!pkg) {
           purchaseLockUntil = 0;
+          return { ok: false, error: "Pro isn't available for purchase right now \u2014 try again shortly." };
+        }
+        if (isZeroPriced(pkg.product)) {
+          purchaseLockUntil = 0;
+          console.error("My Snowball: refusing purchase \u2014 the storefront reports a zero price for the Pro package");
           return { ok: false, error: "Pro isn't available for purchase right now \u2014 try again shortly." };
         }
         const { customerInfo } = await Purchases.purchasePackage({ aPackage: pkg });
@@ -28330,7 +28353,7 @@ but received
     ctx.fillStyle = "#6b7280";
     ctx.textAlign = "left";
     ctx.font = "500 19px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-    ctx.fillText("This code restores your Pro purchase on any device. Keep it private \u2014 anyone with it gets Pro.", 52, H2 - 62);
+    ctx.fillText("Restores Pro in your web browser, on any device. Keep it private \u2014 anyone with it gets Pro.", 52, H2 - 62);
     ctx.fillStyle = "#155e75";
     ctx.font = "700 19px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
     ctx.fillText(CARD_DOMAIN, 52, H2 - 32);

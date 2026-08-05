@@ -1171,7 +1171,7 @@ function showRestoreEntryModal() {
 // For lightweight success feedback (restore succeeded) where a full modal is
 // too heavy. The aria-live announce() is done by callers; this is the visual.
 let _toastTimer = null;
-function showToast(message, actionLabel, onAction) {
+function showToast(message, actionLabel, onAction, ms) {
   let host = $("#snowToast");
   if (!host) {
     host = el("div", "snow-toast"); host.id = "snowToast";
@@ -1189,7 +1189,7 @@ function showToast(message, actionLabel, onAction) {
   }
   host.classList.add("show");
   clearTimeout(_toastTimer);
-  _toastTimer = setTimeout(() => { host.classList.remove("show"); }, 4200);
+  _toastTimer = setTimeout(() => { host.classList.remove("show"); }, ms || 4200);
 }
 
 // ── Pending gated intent ────────────────────────────────────────────────
@@ -1412,7 +1412,9 @@ function launchSnowfall() {
 }
 
 // ── Ownership celebration (once per lifetime) ─────────────────────────────
-// The warm "It's yours — forever" moment shown on the FIRST successful unlock.
+// The celebration shown on the FIRST successful unlock. Headline was "It's yours —
+// forever" until 2026-08-05; removed with the snowfall because it promised a permanence
+// a refund can end. Now reads "Pro, unlocked."
 // Persists CELEBRATED_KEY so it never fires again (not later visits, not
 // restores). `code` may be null (mint failed) — in that case we show the amber
 // self-heal path in place of the code box instead of celebrating a code we
@@ -1426,11 +1428,13 @@ function markCelebrated() {
 
 function showCelebrationModal(code) {
   markCelebrated();
-  launchSnowfall();
+  // launchSnowfall() call removed 2026-08-05 at Eden's request — it drew ON TOP of the
+  // modal (the layer sat above it in the stacking order) and covered the feature list.
+  // The function below is left in place, unused, so it can be restored deliberately.
   const backdrop = el("div", "modal-backdrop");
   const modal = el("div", "modal pro-modal celebrate-modal");
 
-  modal.appendChild(txt("h3", "celebrate-headline", "It's yours — forever."));
+  modal.appendChild(txt("h3", "celebrate-headline", "Pro, unlocked."));
   modal.appendChild(txt("p", "celebrate-thanks", "Thank you. You just gave yourself a clearer path out of debt — take a breath, you've got this."));
 
   const unlocked = el("div", "celebrate-unlocked");
@@ -1697,7 +1701,7 @@ function showProModal(context) {
   ].forEach((f) => list.appendChild(txt("li", null, f)));
   modal.appendChild(list);
   // Durable one-time reassurance line (never "subscription"/"plan"/"trial").
-  modal.appendChild(txt("p", "pro-reassure-durable", "One-time unlock — yours forever. No subscription. (Apps that help you get out of debt shouldn't charge you monthly.)"));
+  modal.appendChild(txt("p", "pro-reassure-durable", "One purchase, not a subscription — you won't be charged again. (Apps that help you get out of debt shouldn't charge you monthly.)"));
   const msgHost = el("div", "pro-msg");
   msgHost.setAttribute("role", "status");
   msgHost.setAttribute("aria-live", "polite");
@@ -1805,7 +1809,7 @@ function showProModal(context) {
         runPendingProIntent();
       } else {
         restoreLink.disabled = false; restoreLink.textContent = prev;
-        showStatus("No previous purchase found. Make sure you're signed in with the Apple Account you bought Pro with.", "info");
+        showStatus("No previous purchase found. Make sure you're signed in with the Apple Account you bought Pro with. Bought on the web? Web and App Store purchases are separate — your code works in your browser.", "info");
       }
     };
   } else {
@@ -2908,47 +2912,19 @@ function buildSettingsView() {
   }
   col.appendChild(vaultCard);
 
-  // Snowball Pro (crown) — web: Restore with a code (+ license card if owned);
-  // iOS: Apple's "Restore Purchases" only — no typed code and no license card on
-  // native (Apple carries the entitlement across the buyer's devices). Web branch
-  // is the exact existing copy/controls.
-  let proControls, proBody;
-  if (IS_NATIVE) {
-    const nativeRestoreBtn = txt("button", "btn ghost sm settings-action", "Restore Purchases"); nativeRestoreBtn.type = "button";
-    nativeRestoreBtn.onclick = async () => {
-      const prev = nativeRestoreBtn.textContent;
-      nativeRestoreBtn.disabled = true; nativeRestoreBtn.textContent = "Restoring…";
-      let res;
-      try { res = await Billing.restorePurchases(); }
-      catch (e) { console.error("Snowball: restore threw", e); res = { ok: false }; }
-      nativeRestoreBtn.disabled = false; nativeRestoreBtn.textContent = prev;
-      if (res && res.ok) {
-        announce("Welcome back — Pro is unlocked on this device.", false);
-        showToast("Welcome back — Pro is unlocked on this device.");
-        refreshAfterProChange();
-        runPendingProIntent();
-      } else {
-        showToast("No previous purchase found for this Apple Account.");
-      }
-    };
-    proControls = [nativeRestoreBtn];
-    proBody = "Already bought Pro on another device? Tap Restore Purchases — it comes back on any device signed in with the same Apple Account.";
-  } else {
-    const restoreCodeBtn = txt("button", "btn ghost sm settings-action", "Restore with a code"); restoreCodeBtn.type = "button";
-    restoreCodeBtn.onclick = () => showRestoreEntryModal();
-    proControls = [restoreCodeBtn];
-    if (Billing && typeof Billing.getRestoreCode === "function" && Billing.getRestoreCode()) {
-      const cardBtn = txt("button", "btn ghost sm settings-action", "View your Pro license card"); cardBtn.type = "button";
-      cardBtn.onclick = () => showLicenseCardModal();
-      proControls.push(cardBtn);
-    }
-    proBody = "Already bought Pro on another device? My Snowball keeps no accounts, so unlock it here with the restore code you saved.";
+  // Snowball Pro (crown) — WEB ONLY: Restore with a code (+ license card if owned).
+  // Removed from iOS Settings 2026-08-05 at Eden's request: on native, the paywall's
+  // "Restore Purchases" link is the restore surface (Apple carries the entitlement
+  // across the buyer's devices), so this card only duplicated it.
+  if (!IS_NATIVE) {
+    let proControls, proBody;
+        showToast("No previous purchase found for this Apple Account. Bought on the web? Web and App Store purchases are separate — your code works in your browser.", null, null, 9000);
+    col.appendChild(settingsCard(
+      "violet", "crown", "My Snowball Pro",
+      proBody,
+      proControls
+    ));
   }
-  col.appendChild(settingsCard(
-    "violet", "crown", "My Snowball Pro",
-    proBody,
-    proControls
-  ));
 
   // Data & privacy (shield) — blurb + honest checklist.
   // Platform-aware body: on iOS Pro is Apple In-App Purchase (never Stripe) and data
@@ -2960,23 +2936,20 @@ function buildSettingsView() {
       : "Everything you enter — balances, rates, minimum payments, your strategy — is stored only in this browser's local storage on this device. There's no account and no server: nothing is uploaded, and the only time My Snowball touches the network is a secure Stripe checkout if you choose to buy Pro."
   );
   const checklist = el("div", "settings-checklist");
-  // iOS shows Apple's localized price here (Apple charges the storefront price, not
-  // always USD); web keeps the literal "$9.99". Falls back to "$9.99" until fetched.
-  const checkPriceLine = (IS_NATIVE ? nativePriceOr("$9.99") : "$9.99") + " once — never a subscription";
+  // No price figure here by design (2026-08-05): a number in a reassurance card goes
+  // stale the day the store price changes. The paywall shows the live price; this card
+  // only promises the shape of the deal.
   [
     "Stored only on this device",
     "No account, no uploads — ever",
     "No bank link · no ads · no tracking",
-    checkPriceLine,
+    "One-time purchase — never a subscription",
   ].forEach((label) => {
     const item = el("div", "settings-check");
     const ic = el("span", "settings-check-icon");
     ic.setAttribute("aria-hidden", "true");
     ic.innerHTML = SETTINGS_ICONS.check;
-    const labelEl = txt("span", null, label);
-    // Tag the price line so a late-arriving Apple priceString swaps in live.
-    if (IS_NATIVE && label === checkPriceLine) labelEl.setAttribute("data-native-price", "{price} once — never a subscription");
-    item.append(ic, labelEl);
+    item.append(ic, txt("span", null, label));
     checklist.appendChild(item);
   });
   privCard.appendChild(checklist);
@@ -2998,7 +2971,7 @@ function buildSettingsView() {
   aside.appendChild(head);
   aside.appendChild(dataAssureRow("brand", "lock", "Private by design", "No sign-ups, no accounts, no cloud."));
   aside.appendChild(dataAssureRow("violet", "cloudOff", "Local backups", "Back up to a file you decide. You own it."));
-  aside.appendChild(dataAssureRow("green", "device", "Restore anywhere", "Use your backup file on any device, anytime."));
+  if (!IS_NATIVE) aside.appendChild(dataAssureRow("green", "device", "Restore anywhere", "Use your backup file on any device, anytime."));
   aside.appendChild(dataAssureRow("amber", "peace", "Peace of mind", "Your financial data is always safe and private."));
   const tip = el("div", "data-assure-tip");
   const tipIc = el("span", "data-assure-tip-icon");
@@ -5691,7 +5664,7 @@ if (IS_NATIVE) {
       refreshAfterProChange();
       runPendingProIntent();
     } else {
-      showToast("No previous purchase found for this Apple Account.");
+      showToast("No previous purchase found for this Apple Account. Bought on the web? Web and App Store purchases are separate — your code works in your browser.", null, null, 9000);
     }
   };
 } else {
