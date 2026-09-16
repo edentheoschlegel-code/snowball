@@ -826,8 +826,13 @@ function licenseDownloadButton(canvas) {
       // save through the OS share sheet like downloadPdfBytes does.
       if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
         const { Filesystem, Share } = window.Capacitor.Plugins;
-        const { uri } = await Filesystem.writeFile({ path: filename, data: dataUrl.split(",")[1], directory: "CACHE" });
-        await Share.share({ title: filename, files: [uri] });
+        // The cache copy lives only as long as this share: it is removed once the sheet
+        // is done, whether shared, dismissed or failed (see holdExportCopy).
+        const releaseCopy = holdExportCopy(filename);
+        try {
+          const { uri } = await Filesystem.writeFile({ path: filename, data: dataUrl.split(",")[1], directory: "CACHE" });
+          await Share.share({ title: filename, files: [uri] });
+        } finally { await releaseCopy(); }
         flash("Saved!");
         return;
       }
@@ -857,7 +862,7 @@ function licenseDownloadButton(canvas) {
       flash("Saved to your downloads");
     } catch (e) {
       // A cancelled share sheet isn't a failure — just reset the label.
-      if (e && (e.name === "AbortError" || e.name === "NotAllowedError")) { btn.textContent = LABEL; return; }
+      if (e && (e.name === "AbortError" || e.name === "NotAllowedError" || isShareCanceled(e))) { btn.textContent = LABEL; return; }
       flash("Couldn't save. Try again");
     }
   };
@@ -1887,8 +1892,13 @@ async function exportVault() {
       // downloadPdfBytes / the license-card PNG save, the pattern the rest of the app uses).
       const { Filesystem, Share } = window.Capacitor.Plugins;
       const base64 = await new Promise((res) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(",")[1]); r.readAsDataURL(blob); });
-      const { uri } = await Filesystem.writeFile({ path: filename, data: base64, directory: "CACHE" });
-      await Share.share({ title: filename, files: [uri] });
+      // The cache copy lives only as long as this share: it is removed once the sheet
+      // is done, whether shared, dismissed or failed (see holdExportCopy).
+      const releaseCopy = holdExportCopy(filename);
+      try {
+        const { uri } = await Filesystem.writeFile({ path: filename, data: base64, directory: "CACHE" });
+        await Share.share({ title: filename, files: [uri] });
+      } finally { await releaseCopy(); }
     } else {
       const a = document.createElement("a"); a.href = url; a.download = filename;
       document.body.appendChild(a); a.click(); a.remove();
@@ -2002,8 +2012,9 @@ async function exportPayoffPlanPdf(activeDebts, primary, statusHost) {
       { x: marginX, y: 34, size: 8, font: reg, color: muted });
 
     const bytes = await pdf.save();
-    await downloadPdfBytes(bytes, `snowball-payoff-plan-${pdfDateStamp()}.pdf`);
-    setStatus("PDF ready. Saved to your downloads.", true);
+    // false = the iPhone share sheet was closed without saving: a quiet no-op, no message.
+    if (!(await downloadPdfBytes(bytes, `snowball-payoff-plan-${pdfDateStamp()}.pdf`))) return;
+    setStatus(IS_NATIVE ? "PDF ready." : "PDF ready. Saved to your downloads.", true);
   } catch (e) {
     setStatus("Couldn't export the PDF. Try again. Your data on this device is unaffected.", false);
   }
@@ -2035,12 +2046,97 @@ async function downloadPdfBytes(bytes, filename) {
     const { Filesystem } = window.Capacitor.Plugins;
     const { Share } = window.Capacitor.Plugins;
     const base64 = await new Promise((res) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(",")[1]); r.readAsDataURL(blob); });
-    const { uri } = await Filesystem.writeFile({ path: filename, data: base64, directory: "CACHE" });
-    await Share.share({ title: filename, files: [uri] });
+    // The cache copy lives only as long as this share: it is removed once the sheet
+    // is done, whether shared, dismissed or failed (see holdExportCopy).
+    const releaseCopy = holdExportCopy(filename);
+    try {
+      const { uri } = await Filesystem.writeFile({ path: filename, data: base64, directory: "CACHE" });
+      await Share.share({ title: filename, files: [uri] });
+    } catch (e) {
+      if (isShareCanceled(e)) return false; // closed without saving: not a failure (the copy is still released below)
+      throw e;
+    } finally { await releaseCopy(); }
   } else {
     const a = document.createElement("a"); a.href = url; a.download = filename;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 4000);
+  }
+  return true;
+}
+
+// The @capacitor/share iOS plugin rejects with exactly "Share canceled" when the
+// share sheet is closed without choosing anything (SharePlugin.swift). That is an
+// ordinary thing to do, not a failure, and it is not a save either: callers treat
+// it as a quiet no-op (no error, no success message, nothing recorded). Any other
+// rejection is a real failure and keeps its existing error.
+function isShareCanceled(e) {
+  return IS_NATIVE && !!e && e.message === "Share canceled";
+}
+
+// ── Native export cache cleanup ────────────────────────────────────────────
+// On iPhone/iPad every export (the payoff-plan PDF, the backup JSON, the calendar
+// .ics, the license-card PNG) is written into the app's own CACHE directory and
+// handed to the share sheet. The sheet copies the file into whatever destination
+// is chosen, so once it has finished this app's own copy has no further job, and
+// that is equally true when the sheet was dismissed or the share failed. Removing
+// it is what keeps a backup (the whole plan plus the restore code) or a plan PDF
+// from sitting on the device after sharing.
+//
+// Exports of the same name can overlap: a quick double tap writes the same file
+// twice, and iOS refuses the second share while the first sheet is still open.
+// So each export holds its file name while it writes and shares, and the copy is
+// removed only when the LAST holder lets go. Otherwise the refused second share
+// could pull the file out from under the sheet that is still showing it.
+const exportCopiesInUse = new Map();
+
+// Call right before writeFile; await the returned release in a finally. The
+// release is silent by design: a delete that does not succeed is not a failed
+// save, so it never throws, never reaches the person, and never changes what the
+// caller does next.
+function holdExportCopy(filename) {
+  exportCopiesInUse.set(filename, (exportCopiesInUse.get(filename) || 0) + 1);
+  return async function releaseExportCopy() {
+    const left = (exportCopiesInUse.get(filename) || 1) - 1;
+    if (left > 0) { exportCopiesInUse.set(filename, left); return; }
+    exportCopiesInUse.delete(filename);
+    try { await window.Capacitor.Plugins.Filesystem.deleteFile({ path: filename, directory: "CACHE" }); } catch (e) {}
+  };
+}
+
+// A copy can still outlive that (iOS can put the app away mid-share, or a delete
+// can simply not succeed), so once per native launch sweepExportCache() clears
+// those stragglers. Deliberately NOT a blanket clear of the cache directory: it
+// looks only at plain files at the top level of that directory, the one place the
+// exports above are written, and only at names this app itself gives them. Every
+// export name is app-generated, so the whole name is matched, not just the
+// extension. Anything else in there (the web engine's own caches, any
+// subdirectory) is left alone, and so is any file an export is holding right now.
+// Best effort end to end: a sweep that cannot run costs nothing.
+const EXPORT_CACHE_FILE = /^snowball-(?:backup-\d{4}-\d{2}-\d{2}\.json|payoff-plan-\d{4}-\d{2}-\d{2}\.pdf|payoff-plan\.ics|pro-license\.png)$/;
+
+async function sweepExportCache() {
+  if (!IS_NATIVE) return; // the web writes no such file at all
+  // Only a fresh launch sweeps. iOS can restart the web view's own process (it
+  // reloads the page) while the app, and any share sheet or Files picker it has
+  // open, stays alive; that sheet may still need its file, and what this page knew
+  // about it is gone. A copy skipped here is cleared at the next launch.
+  try {
+    const nav = performance.getEntriesByType ? performance.getEntriesByType("navigation")[0] : null;
+    if (nav ? nav.type !== "navigate" : (performance.navigation && performance.navigation.type !== 0)) return;
+  } catch (e) {}
+  const Filesystem = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Filesystem;
+  if (!Filesystem) return;
+  let listing;
+  try { listing = await Filesystem.readdir({ path: "", directory: "CACHE" }); }
+  catch (e) { return; }
+  const entries = (listing && listing.files) || [];
+  for (const entry of entries) {
+    // Capacitor 7 returns {name, type, …}; the bare-string form is what older
+    // versions of the plugin returned, kept so a shape change cannot throw.
+    const name = typeof entry === "string" ? entry : ((entry && entry.name) || "");
+    const isDir = typeof entry === "string" ? false : (entry && entry.type) === "directory";
+    if (isDir || !EXPORT_CACHE_FILE.test(name) || exportCopiesInUse.has(name)) continue;
+    try { await Filesystem.deleteFile({ path: name, directory: "CACHE" }); } catch (e) {}
   }
 }
 
@@ -2236,7 +2332,7 @@ function downloadMilestonePng(blob, filename, say) {
   a.href = url; a.download = filename;
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 4000);
-  say("Saved to your downloads.", true);
+  say(IS_NATIVE ? "Ready." : "Saved to your downloads.", true);
 }
 
 function showNoticeModal(title, message, ok) {
@@ -2930,8 +3026,8 @@ function buildSettingsView() {
   const privCard = settingsCard(
     "amber", "shield", "Data & privacy",
     IS_NATIVE
-      ? "Everything you enter (balances, rates, minimum payments, your strategy) is stored only on this device. There's no account and no server: nothing is uploaded, and the only time My Snowball touches the network is when you open the upgrade screen or confirm a Pro unlock through the App Store."
-      : "Everything you enter (balances, rates, minimum payments, your strategy) is stored only in this browser's local storage on this device. There's no account and no server: nothing is uploaded, and the only time My Snowball touches the network is a secure Stripe checkout if you choose to buy Pro."
+      ? "Everything you enter (balances, rates, minimum payments, your strategy) is stored only on this device. There's no account and no server, and nothing you enter is uploaded. My Snowball only goes online for Pro: to check whether you have it (each time it starts, and when you try a Pro feature), to show the price, and to buy or restore through the App Store."
+      : "Everything you enter (balances, rates, minimum payments, your strategy) is stored only in this browser's local storage on this device. There's no account and no server, and nothing you enter is uploaded. My Snowball only goes online for Pro: to check whether you have it, to buy it through a secure Stripe checkout, and to restore it with your code."
   );
   const checklist = el("div", "settings-checklist");
   // No price figure here by design (2026-08-05): a number in a reassurance card goes
@@ -2953,7 +3049,7 @@ function buildSettingsView() {
   privCard.appendChild(checklist);
   // Demonstrable-privacy line: the claim closed/cloud apps can't make.
   privCard.appendChild(txt("p", "settings-verify", IS_NATIVE
-    ? "Want proof? Turn on Airplane Mode and use My Snowball. Everything still works, because your data never depends on a server."
+    ? "Want proof? Turn on Airplane Mode and use My Snowball. Planning still works, because your data never depends on a server."
     : "Want proof? Open your browser's Network tab and use My Snowball. You'll see zero requests carrying your data."));
   col.appendChild(privCard);
 
@@ -4918,14 +5014,23 @@ async function downloadIcs(text, filename) {
       const { Filesystem } = window.Capacitor.Plugins;
       const { Share } = window.Capacitor.Plugins;
       const base64 = await new Promise((res) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(",")[1]); r.readAsDataURL(blob); });
-      const { uri } = await Filesystem.writeFile({ path: filename, data: base64, directory: "CACHE" });
-      await Share.share({ title: filename, files: [uri] });
+      // The cache copy lives only as long as this share: it is removed once the sheet
+      // is done, whether shared, dismissed or failed (see holdExportCopy).
+      const releaseCopy = holdExportCopy(filename);
+      try {
+        const { uri } = await Filesystem.writeFile({ path: filename, data: base64, directory: "CACHE" });
+        await Share.share({ title: filename, files: [uri] });
+      } catch (e) {
+        if (isShareCanceled(e)) return false; // closed without saving: not a failure (the copy is still released below)
+        throw e;
+      } finally { await releaseCopy(); }
     } finally { setTimeout(() => URL.revokeObjectURL(url), 4000); }
   } else {
     const a = document.createElement("a"); a.href = url; a.download = filename;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 4000);
   }
+  return true;
 }
 function buildCalendarExportCard(activeDebts, plan) {
   const card = el("div", "modeler-card");
@@ -4943,7 +5048,8 @@ function buildCalendarExportCard(activeDebts, plan) {
     if (btn.disabled) return;
     try {
       const ics = buildPayoffIcs(activeDebts, plan);
-      await downloadIcs(ics, "snowball-payoff-plan.ics");
+      // false = the iPhone share sheet was closed without saving: a quiet no-op, no message.
+      if (!(await downloadIcs(ics, "snowball-payoff-plan.ics"))) return;
       status.textContent = "Calendar file ready.";
       announce("Calendar file ready.", false);
     } catch (e) {
@@ -5687,6 +5793,14 @@ vaultInput.addEventListener("change", () => {
   importVault(f);
 });
 try { maybeShowSaveNag(); } catch (e) {}
+// Clear any export file a previous run left in the cache (see sweepExportCache).
+// Native only; the web never enters this branch. Started here, in the same task
+// that wires the export buttons, so its directory listing is requested before any
+// tap can start a new export. Never awaited, so it cannot hold up boot, and every
+// failure is swallowed: housekeeping is not worth a message.
+if (IS_NATIVE) {
+  try { sweepExportCache().catch(() => {}); } catch (e) { /* housekeeping only */ }
+}
 
 
 /* Offline support (progressive enhancement): register the service worker ONLY
