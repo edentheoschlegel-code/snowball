@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://js.stripe.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://da08ctfrofx1b.cloudfront.net; font-src 'self'; connect-src 'self' https://api.revenuecat.com https://e.revenue.cat https://js.stripe.com; worker-src 'self' blob:; frame-src https://js.stripe.com; child-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>My Snowball — Private Debt Payoff Planner</title>
-  <meta name="description" content="Plan your debt-free date with the snowball or avalanche method, right on your device. Your balances, rates, and payments never leave your device — no account, no subscriptions.">
+  <title>My Snowball: Private Debt Payoff Planner</title>
+  <meta name="description" content="Plan your debt-free date with the snowball or avalanche method, right on your device. Your balances, rates, and payments are never uploaded. No account needed.">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
@@ -18,21 +18,21 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="My Snowball">
   <meta property="og:url" content="https://mysnowballapp.com/">
-  <meta property="og:title" content="My Snowball — See your debt-free date, privately">
-  <meta property="og:description" content="Plan your debt-free date with the snowball or avalanche method, right on your device. Your balances, rates, and payments never leave your device — no account, no subscriptions.">
+  <meta property="og:title" content="My Snowball: See your debt-free date, privately">
+  <meta property="og:description" content="Plan your debt-free date with the snowball or avalanche method, right on your device. Your balances, rates, and payments are never uploaded. No account needed.">
   <meta property="og:image" content="https://mysnowballapp.com/assets/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="My Snowball — private, on your device">
+  <meta property="og:image:alt" content="My Snowball: private, on your device">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="My Snowball — See your debt-free date, privately">
-  <meta name="twitter:description" content="Plan your debt-free date with the snowball or avalanche method, right on your device. Your balances, rates, and payments never leave your device — no account, no subscriptions.">
+  <meta name="twitter:title" content="My Snowball: See your debt-free date, privately">
+  <meta name="twitter:description" content="Plan your debt-free date with the snowball or avalanche method, right on your device. Your balances, rates, and payments are never uploaded. No account needed.">
   <meta name="twitter:image" content="https://mysnowballapp.com/assets/og-image.png">
   <!-- Sets data-theme before first paint (no light→dark flash). External file
        so it satisfies the strict CSP's script-src 'self' (inline is blocked). -->
-  <script src="theme-init.js?v=91fc78856d"></script>
-  <link rel="stylesheet" href="styles.css?v=91fc78856d">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"My Snowball","url":"https://mysnowballapp.com/","description":"Plan your debt-free date with the snowball or avalanche method, right on your device. Your balances, rates, and payments never leave your device — no account, no subscriptions.","applicationCategory":"FinanceApplication","operatingSystem":"Web, iOS","isAccessibleForFree":true,"browserRequirements":"Requires JavaScript. Runs on your device — no account, no upload.","publisher":{"@type":"Organization","name":"My Snowball"}}</script>
+  <script src="theme-init.js?v=3ff53573f3"></script>
+  <link rel="stylesheet" href="styles.css?v=3ff53573f3">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"My Snowball","url":"https://mysnowballapp.com/","description":"Plan your debt-free date with the snowball or avalanche method, right on your device. Your balances, rates, and payments are never uploaded. No account needed.","applicationCategory":"FinanceApplication","operatingSystem":"Web, iOS","isAccessibleForFree":true,"browserRequirements":"Requires JavaScript. Runs on your device — no account, no upload.","publisher":{"@type":"Organization","name":"My Snowball"}}</script>
 </head>
 <body>
   <a class="skip-link" href="#mainContent">Skip to content</a>
@@ -70,7 +70,7 @@
           <span class="side-link-text">Settings</span>
         </a>
       </nav>
-      <button type="button" class="side-pro" id="sideProCard" hidden aria-label="Unlock My Snowball Pro — $9.99 one-time">
+      <button type="button" class="side-pro" id="sideProCard" hidden aria-label="Unlock My Snowball Pro, $9.99 one-time">
         <span class="side-pro-head">
           <span class="side-pro-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l4.5 3.5L12 5l4.5 6.5L21 8l-1.6 10.2a1 1 0 0 1-1 .8H5.6a1 1 0 0 1-1-.8L3 8z"/></svg></span>
           <span class="side-pro-title">Unlock Pro</span>
@@ -193,7 +193,7 @@
           </svg>
         </div>
         <h1>See your <span class="accent">debt-free date</span>, today</h1>
-        <p>Add your balances, pick a strategy, watch the payoff plan build — no account, no upload, nothing tracked.</p>
+        <p>Add your balances, pick a strategy, watch the payoff plan build. No account, no upload, nothing tracked.</p>
       </div>
 
       <div id="app" class="app"></div>
@@ -201,7 +201,7 @@
   </div>
 
   <footer>
-    My Snowball — a private, in-browser debt payoff planner. Your data stays on your device.
+    My Snowball. A private, in-browser debt payoff planner. Your data stays on your device.
     <div class="footer-legal" style="margin-top: 10px;"><a href="privacy.html">Privacy</a> · <a href="https://edenapps.app/terms.html" target="_blank" rel="noopener">Terms</a> · <a href="support.html">Help</a></div>
     <button type="button" id="footerRestoreLink" class="restore-link" style="margin-top: 8px;">Already bought Pro? Restore with a code</button>
     <button type="button" id="footerLicenseLink" class="restore-link" hidden>View your Pro license card</button>
@@ -220,7 +220,7 @@
   </footer>
 
   <!-- pdf-lib is lazy-loaded on first PDF export (see ensurePdfLib in app.js) -->
-  <script src="billing.js?v=91fc78856d"></script>
-  <script src="app.js?v=91fc78856d"></script>
+  <script src="billing.js?v=3ff53573f3"></script>
+  <script src="app.js?v=3ff53573f3"></script>
 </body>
 </html>

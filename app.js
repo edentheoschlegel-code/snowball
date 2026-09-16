@@ -339,7 +339,7 @@ function applyMonthlyLog(month, amountsById) {
     const bName = (focusBefore.name || "").trim() || "that debt";
     const beforeCleared = safeNumber(focusBefore.balance, { min: 0, max: MAX_MONEY }) <= 0.005;
     lastRerankNote = beforeCleared
-      ? `🎉 ${bName} is paid off — My Snowball now steers your extra at ${aName}.`
+      ? `🎉 ${bName} is paid off. My Snowball now steers your extra at ${aName}.`
       : `${aName} is now your ${state.strategy === "avalanche" ? "highest-rate debt" : "smallest balance"}, so My Snowball targets it next.`;
   } else if (anyCleared) {
     lastRerankNote = `🎉 You cleared ${anyCleared}!`;
@@ -387,7 +387,7 @@ function applySnowflake(amount, source) {
   if (!Array.isArray(state.ledger)) state.ledger = [];
   state.ledger.push({ id: genId(), month: currentMonthKey(), at: new Date().toISOString(), kind: "snowflake", source: (source || "").slice(0, 40), entries: [{ debtId: d.id, paid: amt, interest: 0, before, after }] });
   const name = (d.name || "").trim() || "your focus debt";
-  lastRerankNote = after <= 0.005 ? `🎉 That snowflake cleared ${name}!` : `❄️ ${money(amt)} onto ${name} — every snowflake speeds you up.`;
+  lastRerankNote = after <= 0.005 ? `🎉 That snowflake cleared ${name}!` : `❄️ ${money(amt)} onto ${name}. Every snowflake speeds you up.`;
   snowflakeOpen = false;
   persistNow();
   buildApp();
@@ -535,8 +535,8 @@ function showAutosaveNote(ok) {
   note.style.color = ok ? "" : "var(--danger)";
 }
 function friendly(e) {
-  if (e && e.name === "QuotaExceededError") return "Couldn't save — your browser's local storage is full.";
-  if (e && e.name) return "Couldn't save — local storage is blocked (this can happen in private browsing).";
+  if (e && e.name === "QuotaExceededError") return "Couldn't save. Your browser's local storage is full.";
+  if (e && e.name) return "Couldn't save. Local storage is blocked (this can happen in private browsing).";
   return "Couldn't save right now. Your changes are still on this screen.";
 }
 
@@ -858,7 +858,7 @@ function licenseDownloadButton(canvas) {
     } catch (e) {
       // A cancelled share sheet isn't a failure — just reset the label.
       if (e && (e.name === "AbortError" || e.name === "NotAllowedError")) { btn.textContent = LABEL; return; }
-      flash("Couldn't save — try again");
+      flash("Couldn't save. Try again");
     }
   };
   return btn;
@@ -868,7 +868,7 @@ function copyCodeButton(code) {
   const btn = txt("button", "btn ghost", "Copy code"); btn.type = "button";
   btn.onclick = async () => {
     try { await navigator.clipboard.writeText(code); btn.textContent = "Copied!"; }
-    catch { btn.textContent = "Couldn't copy — select it manually"; }
+    catch { btn.textContent = "Couldn't copy. Select it manually"; }
     setTimeout(() => { btn.textContent = "Copy code"; }, 2000);
   };
   return btn;
@@ -884,7 +884,7 @@ function showLicenseCardModal() {
   const backdrop = el("div", "modal-backdrop");
   const modal = el("div", "modal pro-modal license-modal");
   modal.appendChild(txt("h3", null, "Your Pro license card"));
-  modal.appendChild(txt("p", "hint", "Download it, print it, or screenshot it — this card is your key back into Pro in any browser. Keep your receipt email too as proof of purchase; questions? support@mysnowballapp.com."));
+  modal.appendChild(txt("p", "hint", "Download it, print it, or screenshot it. This card is your key back into Pro in any browser. Keep your receipt email too as proof of purchase; questions? support@mysnowballapp.com."));
   const canvas = Billing.renderLicenseCard(code, "My Snowball");
   canvas.className = "license-card-canvas";
   modal.appendChild(canvas);
@@ -925,7 +925,7 @@ function maybeShowSaveNag() {
   try { ack = localStorage.getItem(CODE_ACK_KEY); } catch { /* treat as unacknowledged */ }
   if (ack === "1" || $("#saveNagBanner")) return;
   const bar = el("div", "save-nag"); bar.id = "saveNagBanner";
-  bar.appendChild(txt("span", "save-nag-text", "Keep Pro safe — save your license card so you can restore it anytime."));
+  bar.appendChild(txt("span", "save-nag-text", "Keep Pro safe. Save your license card so you can restore it anytime."));
   const view = txt("button", "btn sm save-nag-view", "View card"); view.type = "button";
   view.onclick = () => showLicenseCardModal();
   bar.appendChild(view);
@@ -953,7 +953,7 @@ function maybeShowSelfHealNag() {
   if (heldCode) return; // has a code — the save-card nag covers it
   if ($("#saveNagBanner")) return;
   const bar = el("div", "save-nag"); bar.id = "saveNagBanner";
-  bar.appendChild(txt("span", "save-nag-text", "You're Pro on this browser — create your restore code so you can unlock other devices too."));
+  bar.appendChild(txt("span", "save-nag-text", "You're Pro on this browser. Create your restore code so you can unlock other devices too."));
   const make = txt("button", "btn sm save-nag-view", "Create code"); make.type = "button";
   make.onclick = async () => {
     make.disabled = true; make.textContent = "Creating…";
@@ -966,7 +966,7 @@ function maybeShowSelfHealNag() {
       showRestoreCodeModal(res.restoreCode);
     } else {
       make.disabled = false; make.textContent = "Create code";
-      announce("No luck yet — Pro still works here; we'll offer again next visit, and " + SUPPORT_EMAIL + " + your receipt always work.", false);
+      announce("No luck yet. Pro still works here; we'll offer again next visit, and " + SUPPORT_EMAIL + " + your receipt always work.", false);
     }
   };
   bar.appendChild(make);
@@ -1046,16 +1046,16 @@ function showRefundModal() {
 function showRestoreCodeModal(code) {
   const backdrop = el("div", "modal-backdrop");
   const modal = el("div", "modal pro-modal license-modal");
-  modal.appendChild(txt("h3", null, "You're Pro — here's your restore code"));
-  modal.appendChild(txt("p", "hint", "My Snowball keeps no accounts, so this code is your key to unlock Pro in another browser — on your phone or computer. Save it somewhere safe and you're all set."));
-  modal.appendChild(txt("p", "hint", "Keep your receipt email too — it's your proof of purchase. Questions? support@mysnowballapp.com."));
+  modal.appendChild(txt("h3", null, "You're Pro. Here's your restore code"));
+  modal.appendChild(txt("p", "hint", "My Snowball keeps no accounts, so this code is your key to unlock Pro in another browser, on your phone or computer. Save it somewhere safe and you're all set."));
+  modal.appendChild(txt("p", "hint", "Keep your receipt email too. It's your proof of purchase. Questions? support@mysnowballapp.com."));
   const codeBox = el("div", "restore-code-box");
-  const codeText = txt("code", "restore-code-value", code || "—");
+  const codeText = txt("code", "restore-code-value", code || "…");
   codeBox.appendChild(codeText);
   const copyBtn = txt("button", "btn ghost sm", "Copy"); copyBtn.type = "button";
   copyBtn.onclick = async () => {
     try { await navigator.clipboard.writeText(code); copyBtn.textContent = "Copied!"; }
-    catch { copyBtn.textContent = "Couldn't copy — select and copy manually"; }
+    catch { copyBtn.textContent = "Couldn't copy. Select and copy manually"; }
     setTimeout(() => { copyBtn.textContent = "Copy"; }, 2000);
   };
   codeBox.appendChild(copyBtn);
@@ -1139,19 +1139,19 @@ function showRestoreEntryModal() {
     goBtn.disabled = true; goBtn.textContent = "Checking…";
     let res;
     try { res = await Billing.restoreWithCode(formatRestoreCodeInput(input.value)); }
-    catch (e) { res = { ok: false, error: "Couldn't restore — try again." }; }
+    catch (e) { res = { ok: false, error: "Couldn't restore. Try again." }; }
     if (res && res.ok) {
       a11y.close();
-      announce("Welcome back — Pro is unlocked on this device.", false);
-      showToast("Welcome back — Pro is unlocked on this device.");
+      announce("Welcome back. Pro is unlocked on this device.", false);
+      showToast("Welcome back. Pro is unlocked on this device.");
       refreshAfterProChange();
       runPendingProIntent();
     } else {
       goBtn.disabled = false; goBtn.textContent = "Restore";
       msgHost.innerHTML = "";
       const errText = (res && res.offline)
-        ? "You're offline — restoring Pro needs a connection to verify your code. Everything else works offline."
-        : ((res && res.error) || "Couldn't restore — try again.");
+        ? "You're offline. Restoring Pro needs a connection to verify your code. Everything else works offline."
+        : ((res && res.error) || "Couldn't restore. Try again.");
       announce(errText, true);
       const s = el("div", "status-msg err");
       s.appendChild(document.createTextNode(errText));
@@ -1282,13 +1282,13 @@ function showAccessEndedNotice() {
   const bar = el("div", "save-nag access-ended"); bar.id = "saveNagBanner";
   // Say WHY it usually happens (a refund) and give the path out if it's a mistake —
   // "access ended" with no reason or contact reads as a broken "yours forever" promise.
-  bar.appendChild(txt("span", "save-nag-text", "Your Pro access has ended — this usually follows a refund. If it's unexpected, email " + SUPPORT_EMAIL + " and we'll sort it out. Everything you made is safe and still here, and every free feature keeps working — you're always welcome back."));
+  bar.appendChild(txt("span", "save-nag-text", "Your Pro access has ended. This usually follows a refund. If it's unexpected, email " + SUPPORT_EMAIL + " and we'll sort it out. Everything you made is safe and still here, and every free feature keeps working. You're always welcome back."));
   const close = txt("button", "save-nag-close", "×"); close.type = "button";
   close.setAttribute("aria-label", "Dismiss");
   close.onclick = () => bar.remove();
   bar.appendChild(close);
   document.body.insertBefore(bar, document.body.firstChild);
-  announce("Your Pro access has ended — this usually follows a refund. If it's unexpected, email " + SUPPORT_EMAIL + " and we'll sort it out. Everything you made is safe and still here, and every free feature keeps working.", false);
+  announce("Your Pro access has ended. This usually follows a refund. If it's unexpected, email " + SUPPORT_EMAIL + " and we'll sort it out. Everything you made is safe and still here, and every free feature keeps working.", false);
 }
 
 // ── Refund request (customer-initiated, request-only) ─────────────────────
@@ -1298,7 +1298,7 @@ function showAccessEndedNotice() {
 function refundMailtoHref() {
   let code = null;
   try { code = Billing.getRestoreCode(); } catch (e) { code = null; }
-  const subject = "Refund request — My Snowball Pro";
+  const subject = "Refund request: My Snowball Pro";
   const body =
     "Hi My Snowball team,\n\n" +
     "I'd like to request a refund for my Pro purchase.\n\n" +
@@ -1321,7 +1321,7 @@ function buildRefundBlock() {
   // Rebuild the href at click time so a code minted mid-session is included.
   link.addEventListener("click", () => { link.href = refundMailtoHref(); });
   wrap.appendChild(link);
-  wrap.appendChild(txt("p", "refund-note", "30-day money-back guarantee. Email us and a real person reviews it — no forms, no runaround. Once approved, your refund goes back to your original payment method and takes about 5–10 business days to appear on your statement."));
+  wrap.appendChild(txt("p", "refund-note", "30-day money-back guarantee. Email us and a real person reviews it, no forms, no runaround. Once approved, your refund goes back to your original payment method and takes about 5 to 10 business days to appear on your statement."));
   return wrap;
 }
 
@@ -1435,12 +1435,12 @@ function showCelebrationModal(code) {
   const modal = el("div", "modal pro-modal celebrate-modal");
 
   modal.appendChild(txt("h3", "celebrate-headline", "Pro, unlocked."));
-  modal.appendChild(txt("p", "celebrate-thanks", "Thank you. You just gave yourself a clearer path out of debt — take a breath, you've got this."));
+  modal.appendChild(txt("p", "celebrate-thanks", "Thank you. You just gave yourself a clearer path out of debt. Take a breath, you've got this."));
 
   const unlocked = el("div", "celebrate-unlocked");
   unlocked.appendChild(txt("div", "celebrate-unlocked-title", "What you just unlocked"));
   const ul = el("ul", "celebrate-list");
-  ["Plan every debt you have — no 4-debt limit", "Your full payoff plan as a PDF — every debt, in payoff order, with the date each one clears", "Refinance & balance-transfer modeler — see if a new rate actually saves you money after fees"]
+  ["Plan every debt you have, no 4-debt limit", "Your full payoff plan as a PDF: every debt, in payoff order, with the date each one clears", "Refinance & balance-transfer modeler. See if a new rate actually saves you money after fees"]
     .forEach((f) => ul.appendChild(txt("li", null, f)));
   unlocked.appendChild(ul);
   modal.appendChild(unlocked);
@@ -1449,7 +1449,7 @@ function showCelebrationModal(code) {
 
   if (code) {
     // Normal path: reveal the save-your-code / license-card section inline.
-    modal.appendChild(txt("p", "celebrate-code-lead", "One last thing — save your restore code. My Snowball keeps no accounts, so this code is your key to unlock Pro in another browser — on your phone or computer."));
+    modal.appendChild(txt("p", "celebrate-code-lead", "One last thing. Save your restore code. My Snowball keeps no accounts, so this code is your key to unlock Pro in another browser, on your phone or computer."));
     const codeBox = el("div", "restore-code-box");
     codeBox.appendChild(txt("code", "restore-code-value", code));
     codeBox.appendChild(copyCodeButton(code));
@@ -1465,7 +1465,7 @@ function showCelebrationModal(code) {
   } else if (IS_NATIVE) {
     // Apple IAP mints no restore CODE — cross-device restore is handled by the Apple ID +
     // "Restore Purchases", so skip the mint section entirely and show a clean success.
-    modal.appendChild(txt("p", "hint", "Pro is unlocked on this device — and it restores free on your other Apple devices. Just tap “Restore Purchases” there, signed in with the same Apple Account."));
+    modal.appendChild(txt("p", "hint", "Pro is unlocked on this device, and it restores free on your other Apple devices. Just tap “Restore Purchases” there, signed in with the same Apple Account."));
     const actions = el("div", "pro-actions");
     const doneBtn = txt("button", "btn big", "Done"); doneBtn.type = "button";
     doneBtn.onclick = () => { a11y.close(); refreshAfterProChange(); runPendingProIntent(); };
@@ -1486,7 +1486,7 @@ function showCelebrationModal(code) {
 // have Pro-but-no-code. On success it swaps in the normal save-code modal.
 function appendMintCodeSection(modal, a11y) {
   const host = el("div", "mint-code-section");
-  host.appendChild(txt("p", "mint-code-note", "One thing — we couldn't create your restore code just now. Pro already works on this browser. Tap to create your code for other devices."));
+  host.appendChild(txt("p", "mint-code-note", "One thing. We couldn't create your restore code just now. Pro already works on this browser. Tap to create your code for other devices."));
   const msg = el("div", "pro-msg");
   const btn = txt("button", "btn big", "Create my restore code"); btn.type = "button";
   btn.onclick = async () => {
@@ -1501,7 +1501,7 @@ function appendMintCodeSection(modal, a11y) {
     } else {
       btn.disabled = false; btn.textContent = "Create my restore code";
       msg.innerHTML = "";
-      const line = `No luck yet — Pro still works here; we'll offer again next visit, and ${SUPPORT_EMAIL} + your receipt always work.`;
+      const line = `No luck yet. Pro still works here; we'll offer again next visit, and ${SUPPORT_EMAIL} + your receipt always work.`;
       announce(line, false);
       const s = el("div", "status-msg err");
       s.appendChild(document.createTextNode(line));
@@ -1536,9 +1536,9 @@ function handlePurchaseSuccess(restoreCode) {
 // failure. Reassure, give them their restore code now, and quietly promote to a full
 // unlock the moment the entitlement lands (no manual reload needed).
 function handlePurchasePending(restoreCode, message) {
-  const msg = message || "Your payment went through — your Pro is unlocking now. If it doesn't appear in a moment, reload this page.";
+  const msg = message || "Your payment went through. Your Pro is unlocking now. If it doesn't appear in a moment, reload this page.";
   announce(msg, false);
-  showToast("Payment received — unlocking your Pro…");
+  showToast("Payment received. Unlocking your Pro…");
   if (restoreCode) showRestoreCodeModal(restoreCode); // they paid; hand over their key straight away
   let tries = 0;
   const timer = setInterval(async () => {
@@ -1573,7 +1573,7 @@ function renderPurchaseError(msgHost, onRetry) {
   // Assertive announce for AT (mirrors the old showStatus("…","err") call).
   // "no charge was made just now" (not "nothing was charged"): scoped to THIS attempt — honest
   // even if an earlier attempt did charge.
-  announce("Something went wrong. If your card was charged, your Pro will unlock automatically on your next visit — otherwise no charge was made just now. " + (IS_NATIVE ? "Your App Store receipt is the record of what was charged, if anything." : "You're covered by our 30-day money-back guarantee.") + " Still stuck? Email " + SUPPORT_EMAIL + (IS_NATIVE ? " with your App Store receipt and we'll sort it out." : " with your Stripe receipt and we'll sort it out."), true);
+  announce("Something went wrong. If your card was charged, your Pro will unlock automatically on your next visit. Otherwise no charge was made just now. " + (IS_NATIVE ? "Your App Store receipt is the record of what was charged, if anything." : "You're covered by our 30-day money-back guarantee.") + " Still stuck? Email " + SUPPORT_EMAIL + (IS_NATIVE ? " with your App Store receipt and we'll sort it out." : " with your Stripe receipt and we'll sort it out."), true);
 
   const box = el("div", "purchase-error");
   box.setAttribute("role", "alert");
@@ -1592,7 +1592,7 @@ function renderPurchaseError(msgHost, onRetry) {
 
   box.appendChild(txt("h4", "purchase-error-title", "Something went wrong"));
   box.appendChild(txt("p", "purchase-error-body",
-    "If your card was charged, your Pro will unlock automatically on your next visit — otherwise no charge was made just now."));
+    "If your card was charged, your Pro will unlock automatically on your next visit. Otherwise no charge was made just now."));
   // On iOS, Apple owns IAP charges and refunds — no self-run money-back promise
   // (mirrors Local Invoice's gated wording). Web keeps the exact existing copy.
   box.appendChild(txt("p", "purchase-error-reassure", IS_NATIVE
@@ -1652,7 +1652,7 @@ function refreshNativePriceLabels() {
   if (card) {
     const priceEl = card.querySelector(".side-pro-price");
     if (priceEl) priceEl.textContent = p + " · one-time";
-    card.setAttribute("aria-label", "Unlock My Snowball Pro — " + p + " one-time");
+    card.setAttribute("aria-label", "Unlock My Snowball Pro, " + p + " one-time");
   }
 }
 function ensureNativePrice() {
@@ -1676,9 +1676,9 @@ function showProModal(context) {
   // but stays textContent to honor the app's no-innerHTML-for-data rule).
   let lead = null;
   if (context && context.reason === "debtCap" && Number.isFinite(context.count)) {
-    lead = `You have ${context.count} debts — plan all of them with Pro`;
+    lead = `You have ${context.count} debts. Plan all of them with Pro`;
   } else if (context && context.reason === "exportPdf") {
-    lead = "Take your plan with you — export it as a PDF";
+    lead = "Take your plan with you. Export it as a PDF";
   } else if (context && context.reason === "refinance") {
     lead = "See whether refinancing a debt actually saves money";
   }
@@ -1695,13 +1695,11 @@ function showProModal(context) {
   // Outcome-framed benefit bullets (experience-audit copy).
   const list = el("ul", "pro-features");
   [
-    "Plan every debt you have — no 4-debt limit",
-    "Your full payoff plan as a PDF — every debt, the exact payoff order, and the date each one clears",
-    "Refinance & balance-transfer modeler — see whether moving a debt to a lower rate (after the fee) actually saves you money.",
+    "Plan every debt you have, no 4-debt limit",
+    "Your full payoff plan as a PDF: every debt, the exact payoff order, and the date each one clears",
+    "Refinance & balance-transfer modeler. See whether moving a debt to a lower rate (after the fee) actually saves you money.",
   ].forEach((f) => list.appendChild(txt("li", null, f)));
   modal.appendChild(list);
-  // Durable one-time reassurance line (never "subscription"/"plan"/"trial").
-  modal.appendChild(txt("p", "pro-reassure-durable", "One purchase, not a subscription — you won't be charged again. (Apps that help you get out of debt shouldn't charge you monthly.)"));
   const msgHost = el("div", "pro-msg");
   msgHost.setAttribute("role", "status");
   msgHost.setAttribute("aria-live", "polite");
@@ -1710,13 +1708,13 @@ function showProModal(context) {
   if (IS_NATIVE) {
     // Apple IAP: no Stripe, no email receipt, no "your statement" (Apple bills), no self-run
     // money-back (refunds go through Apple's Report a Problem). One clean line replaces all three.
-    modal.appendChild(txt("p", "hint pro-reassure", "Payment is handled securely by the App Store, with the Apple Account you already use — it restores free on your other Apple devices."));
+    modal.appendChild(txt("p", "hint pro-reassure", "Payment is handled securely by the App Store, with the Apple Account you already use. It restores free on your other Apple devices."));
   } else {
     // Name BOTH payment brands up front: the hosted checkout's own header says
     // "Secure checkout by RevenueCat", so pre-framing only Stripe made a third
     // name appear mid-payment. Now every name the buyer meets was announced here.
-    modal.appendChild(txt("p", "hint pro-reassure", "Secure checkout by Stripe (via RevenueCat). You'll enter an email for your receipt only — it's not an account, and we never see your card."));
-    modal.appendChild(txt("p", "hint pro-reassure", "30-day money-back guarantee — email " + SUPPORT_EMAIL + "."));
+    modal.appendChild(txt("p", "hint pro-reassure", "Secure checkout by Stripe (via RevenueCat). You'll enter an email for your receipt only. It's not an account, and we never see your card."));
+    modal.appendChild(txt("p", "hint pro-reassure", "30-day money-back guarantee. Email " + SUPPORT_EMAIL + "."));
     // Statement descriptor: Snowball is part of the Eden Apps family, so the card
     // charge reads "EDEN APPS". Name it at the pay moment so a buyer isn't confused.
     {
@@ -1732,7 +1730,7 @@ function showProModal(context) {
     // Private-browsing heads-up (web only): this window won't keep the restore code, and the
     // code is the only key back into Pro — one plain line before they pay, said once.
     if (!storageProbeOk()) {
-      modal.appendChild(txt("p", "hint pro-reassure", "Heads up — this browser isn't saving data, so keep your receipt and restore code somewhere safe after you buy."));
+      modal.appendChild(txt("p", "hint pro-reassure", "Heads up. This browser isn't saving data, so keep your receipt and restore code somewhere safe after you buy."));
     }
   }
   const a11y = makeModalAccessible(backdrop, modal, { escCloses: true });
@@ -1769,13 +1767,13 @@ function showProModal(context) {
     if (res && res.inFlight) {
       // A purchase from a moment ago is still settling (entitlement attaching). Don't open a
       // second checkout or show an error card — reassure, and Pro unlocks itself when it lands.
-      showStatus("Your purchase is still going through — give it a moment and Pro will unlock automatically.", "info");
+      showStatus("Your purchase is still going through. Give it a moment and Pro will unlock automatically.", "info");
     } else if (res && res.cancelled) {
       // Deliberate close — neutral/grey, never red, no retry-nag.
-      showStatus("No charge was made — Pro will be here whenever you're ready.", "info");
+      showStatus("No charge was made. Pro will be here whenever you're ready.", "info");
     } else if (res && res.offline) {
       // Scoped to THIS attempt ("just now") — honest even if an earlier attempt did charge.
-      showStatus("You're offline — buying Pro needs a connection for the secure checkout. Everything else works offline, and no charge was made just now.", "info");
+      showStatus("You're offline. Buying Pro needs a connection for the secure checkout. Everything else works offline, and no charge was made just now.", "info");
     } else if (res && res.pending) {
       // PAID — the charge SUCCEEDED; the entitlement is only still attaching (a few seconds).
       // Never show the "purchase didn't start / you weren't charged" card or a re-buy button to
@@ -1803,13 +1801,13 @@ function showProModal(context) {
       catch (e) { console.error("Snowball: restore threw", e); res = { ok: false }; }
       if (res && res.ok) {
         close();
-        announce("Welcome back — Pro is unlocked on this device.", false);
-        showToast("Welcome back — Pro is unlocked on this device.");
+        announce("Welcome back. Pro is unlocked on this device.", false);
+        showToast("Welcome back. Pro is unlocked on this device.");
         refreshAfterProChange();
         runPendingProIntent();
       } else {
         restoreLink.disabled = false; restoreLink.textContent = prev;
-        showStatus("No previous purchase found. Make sure you're signed in with the Apple Account you bought Pro with. Bought on the web? Web and App Store purchases are separate — your code works in your browser.", "info");
+        showStatus("No previous purchase found. Make sure you're signed in with the Apple Account you bought Pro with. Bought on the web? Web and App Store purchases are separate. Your code works in your browser.", "info");
       }
     };
   } else {
@@ -1858,7 +1856,7 @@ function buildBackupNudge() {
   body.appendChild(txt("div", "backup-nudge-title", never ? "Keep your plan safe" : "Time for a fresh backup"));
   body.appendChild(txt("div", "backup-nudge-msg", never
     ? "Your data lives only on this device. Save a backup file so clearing your browser can never wipe your plan."
-    : "It's been a while since your last backup — a quick save keeps your progress safe."));
+    : "It's been a while since your last backup. A quick save keeps your progress safe."));
   box.appendChild(body);
   const acts = el("div", "backup-nudge-acts");
   const go = txt("button", "btn brand sm", "Back up now"); go.type = "button"; go.onclick = () => exportVault();
@@ -2000,14 +1998,14 @@ async function exportPayoffPlanPdf(activeDebts, primary, statusHost) {
     });
 
     // Footer.
-    page.drawText("Made with My Snowball — a private, on-device debt payoff planner. mysnowballapp.com",
+    page.drawText("Made with My Snowball. A private, on-device debt payoff planner. mysnowballapp.com",
       { x: marginX, y: 34, size: 8, font: reg, color: muted });
 
     const bytes = await pdf.save();
     await downloadPdfBytes(bytes, `snowball-payoff-plan-${pdfDateStamp()}.pdf`);
-    setStatus("PDF ready — saved to your downloads.", true);
+    setStatus("PDF ready. Saved to your downloads.", true);
   } catch (e) {
-    setStatus("Couldn't export the PDF — try again. Your data on this device is unaffected.", false);
+    setStatus("Couldn't export the PDF. Try again. Your data on this device is unaffected.", false);
   }
 }
 // Truncates text to fit maxWidth at the given font/size using real glyph
@@ -2199,7 +2197,7 @@ function renderMilestoneCard(plan, debtCount, dateStr) {
 
   ctx.fillStyle = "#6b7280"; // --muted
   ctx.font = `600 27px ${FONT}`;
-  ctx.fillText("Planned privately — my numbers never left my device", contentLeft + 52, footY - 4);
+  ctx.fillText("Planned privately. My numbers never left my device", contentLeft + 52, footY - 4);
   ctx.fillStyle = "#155e75"; // --brand-dark
   ctx.font = `700 27px ${FONT}`;
   ctx.fillText("mysnowballapp.com", contentLeft + 52, footY + 34);
@@ -2216,11 +2214,11 @@ function shareMilestoneCard(canvas, onStatus) {
   const say = (m, ok) => { if (typeof onStatus === "function") onStatus(m, ok); };
   const filename = "snowball-debt-free.png";
   canvas.toBlob((blob) => {
-    if (!blob) { say("Couldn't create the image — try again.", false); return; }
+    if (!blob) { say("Couldn't create the image. Try again.", false); return; }
     const file = new File([blob], filename, { type: "image/png" });
     // Prefer the native share sheet when the browser can share this file.
     if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
-      navigator.share({ files: [file], title: "My debt-free date", text: "I'll be debt-free — planned with My Snowball." })
+      navigator.share({ files: [file], title: "My debt-free date", text: "I'll be debt-free. Planned with My Snowball." })
         .then(() => say("Shared.", true))
         .catch((e) => {
           // A user-cancelled share isn't an error; anything else falls back to a download.
@@ -2262,11 +2260,11 @@ function showNoticeModal(title, message, ok) {
 function importVault(file) {
   if (!file) return;
   const reader = new FileReader();
-  reader.onerror = () => showNoticeModal("Restore from backup", "Couldn't read that file — try picking it again.", false);
+  reader.onerror = () => showNoticeModal("Restore from backup", "Couldn't read that file. Try picking it again.", false);
   reader.onload = () => {
     let payload;
     try { payload = JSON.parse(String(reader.result)); }
-    catch { showNoticeModal("Restore from backup", "That file isn't a My Snowball backup — it couldn't be read.", false); return; }
+    catch { showNoticeModal("Restore from backup", "That file isn't a My Snowball backup. It couldn't be read.", false); return; }
     if (!payload || typeof payload !== "object" || payload.app !== VAULT_APP_ID) {
       const other = payload && typeof payload.app === "string" && payload.app.trim() ? payload.app.trim() : null;
       showNoticeModal("Restore from backup", other ? `That backup is from ${other}.` : "That file doesn't look like a My Snowball backup.", false);
@@ -2312,12 +2310,12 @@ function importVault(file) {
             // Pro, and the retry path (code entry in the footer) is named. Web-only: the
             // native branch above never redeems a code, so no App Store wording is needed.
             const detail = (res && res.offline)
-              ? "You're offline — restoring Pro needs a connection to verify your code."
-              : ((res && res.error) || "Couldn't check that code — try again.");
+              ? "You're offline. Restoring Pro needs a connection to verify your code."
+              : ((res && res.error) || "Couldn't check that code. Try again.");
             const s = el("div", "status-msg err");
             s.appendChild(document.createTextNode(
               "Your data was restored, but Pro didn't come back from the code in your backup. " + detail +
-              " You can try again anytime — “Restore with a code” is in the footer."));
+              " You can try again anytime. “Restore with a code” is in the footer."));
             notice.insertBefore(s, notice.lastChild);
           }
         }).catch((e) => { console.error("Snowball: backup Pro restore failed", e); /* the notice modal stays usable either way */ });
@@ -2346,15 +2344,15 @@ const DEFAULT_ROUTE = "plan";
 const ROUTE_HERO = {
   plan: {
     h1: 'See your <span class="accent">debt-free date</span>, today',
-    p: "Add your balances, pick a strategy, watch the payoff plan build — no account, no upload, nothing tracked.",
+    p: "Add your balances, pick a strategy, watch the payoff plan build. No account, no upload, nothing tracked.",
   },
   payoff: {
     h1: 'Your <span class="accent">payoff plan</span>',
-    p: "Your personalized path to debt-free — payoff order, charts, and what-if tools, all figured on this device.",
+    p: "Your personalized path to debt-free. Payoff order, charts, and what-if tools, all figured on this device.",
   },
   settings: {
     h1: '<span class="accent">Settings</span> &amp; your data',
-    p: "Your theme, your backups, and your Pro unlock — everything about how My Snowball lives on this device.",
+    p: "Your theme, your backups, and your Pro unlock. Everything about how My Snowball lives on this device.",
   },
 };
 function currentRoute() {
@@ -2405,8 +2403,8 @@ function renderPlanView(root) {
   stPanel.appendChild(panelTitle("Strategy", "strategy"));
   const picker = el("div", "strategy-picker");
   [
-    ["snowball", "Snowball", "Smallest balance first — quick wins build momentum."],
-    ["avalanche", "Avalanche", "Highest interest rate first — mathematically the cheapest."],
+    ["snowball", "Snowball", "Smallest balance first. Quick wins build momentum."],
+    ["avalanche", "Avalanche", "Highest interest rate first. Mathematically the cheapest."],
     ["custom", "Custom", "Pay them off in an order you choose."],
   ].forEach(([id, name, desc]) => {
     const opt = el("button", `strategy-opt${state.strategy === id ? " active" : ""}`);
@@ -2630,7 +2628,7 @@ function renderPayoffView(root) {
   badge.append(badgeIc, txt("span", null, "Personalized for you"));
   titleRow.appendChild(badge);
   heroText.appendChild(titleRow);
-  heroText.appendChild(txt("p", "payoff-hero-sub", "Your personalized path to debt-free — payoff order, charts, and what-if tools, all figured on this device."));
+  heroText.appendChild(txt("p", "payoff-hero-sub", "Your personalized path to debt-free. Payoff order, charts, and what-if tools, all figured on this device."));
   const heroArt = el("div", "payoff-hero-art");
   heroArt.setAttribute("aria-hidden", "true");
   // Dimensional summit scene (Payoff mockup harvest): a layered blue mountain
@@ -2805,7 +2803,7 @@ function buildSettingsView() {
   h2.appendChild(document.createTextNode(" "));
   h2.appendChild(txt("span", null, "& your data"));
   heroText.appendChild(h2);
-  heroText.appendChild(txt("p", "settings-hero-sub", "Your theme, your backups, and your Pro unlock — everything about how My Snowball lives on this device."));
+  heroText.appendChild(txt("p", "settings-hero-sub", "Your theme, your backups, and your Pro unlock. Everything about how My Snowball lives on this device."));
   const heroArt = el("div", "settings-hero-art");
   heroArt.setAttribute("aria-hidden", "true");
   // Dimensional vault scene (Settings mockup harvest): a gradient-shaded safe
@@ -2895,8 +2893,8 @@ function buildSettingsView() {
   const vaultCard = settingsCard(
     "green", "vault", "Data Vault",
     IS_NATIVE
-      ? "Your debts and plan live only on this device. Back them up to a file you keep, and restore that file on any device — My Snowball never uploads anything."
-      : "Your debts and plan live only in this browser. Back them up to a file you keep, and restore that file on any device — My Snowball never uploads anything.",
+      ? "Your debts and plan live only on this device. Back them up to a file you keep, and restore that file on any device. My Snowball never uploads anything."
+      : "Your debts and plan live only in this browser. Back them up to a file you keep, and restore that file on any device. My Snowball never uploads anything.",
     [backupBtn, restoreBtn]
   );
   // Honest last-backup line: makes on-device data-loss defense visible.
@@ -2907,7 +2905,7 @@ function buildSettingsView() {
     line.appendChild(dot);
     line.appendChild(txt("span", null, last
       ? `Last backed up ${relTimeSince(last)}.`
-      : "You haven't backed up on this device yet — save a copy so a cleared browser can't take your plan."));
+      : "You haven't backed up on this device yet. Save a copy so a cleared browser can't take your plan."));
     vaultCard.appendChild(line);
   }
   col.appendChild(vaultCard);
@@ -2918,7 +2916,7 @@ function buildSettingsView() {
   // across the buyer's devices), so this card only duplicated it.
   if (!IS_NATIVE) {
     let proControls, proBody;
-        showToast("No previous purchase found for this Apple Account. Bought on the web? Web and App Store purchases are separate — your code works in your browser.", null, null, 9000);
+        showToast("No previous purchase found for this Apple Account. Bought on the web? Web and App Store purchases are separate. Your code works in your browser.", null, null, 9000);
     col.appendChild(settingsCard(
       "violet", "crown", "My Snowball Pro",
       proBody,
@@ -2932,8 +2930,8 @@ function buildSettingsView() {
   const privCard = settingsCard(
     "amber", "shield", "Data & privacy",
     IS_NATIVE
-      ? "Everything you enter — balances, rates, minimum payments, your strategy — is stored only on this device. There's no account and no server: nothing is uploaded, and the only time My Snowball touches the network is when you open the upgrade screen or confirm a Pro unlock through the App Store."
-      : "Everything you enter — balances, rates, minimum payments, your strategy — is stored only in this browser's local storage on this device. There's no account and no server: nothing is uploaded, and the only time My Snowball touches the network is a secure Stripe checkout if you choose to buy Pro."
+      ? "Everything you enter (balances, rates, minimum payments, your strategy) is stored only on this device. There's no account and no server: nothing is uploaded, and the only time My Snowball touches the network is when you open the upgrade screen or confirm a Pro unlock through the App Store."
+      : "Everything you enter (balances, rates, minimum payments, your strategy) is stored only in this browser's local storage on this device. There's no account and no server: nothing is uploaded, and the only time My Snowball touches the network is a secure Stripe checkout if you choose to buy Pro."
   );
   const checklist = el("div", "settings-checklist");
   // No price figure here by design (2026-08-05): a number in a reassurance card goes
@@ -2941,9 +2939,9 @@ function buildSettingsView() {
   // only promises the shape of the deal.
   [
     "Stored only on this device",
-    "No account, no uploads — ever",
+    "No account, no uploads, ever",
     "No bank link · no ads · no tracking",
-    "One-time purchase — never a subscription",
+    "One-time purchase",
   ].forEach((label) => {
     const item = el("div", "settings-check");
     const ic = el("span", "settings-check-icon");
@@ -2955,8 +2953,8 @@ function buildSettingsView() {
   privCard.appendChild(checklist);
   // Demonstrable-privacy line: the claim closed/cloud apps can't make.
   privCard.appendChild(txt("p", "settings-verify", IS_NATIVE
-    ? "Want proof? Turn on Airplane Mode and use My Snowball — everything still works, because your data never depends on a server."
-    : "Want proof? Open your browser's Network tab and use My Snowball — you'll see zero requests carrying your data."));
+    ? "Want proof? Turn on Airplane Mode and use My Snowball. Everything still works, because your data never depends on a server."
+    : "Want proof? Open your browser's Network tab and use My Snowball. You'll see zero requests carrying your data."));
   col.appendChild(privCard);
 
   grid.appendChild(col);
@@ -3065,7 +3063,7 @@ function buildGoalSeekPanel() {
       return;
     }
     if (res.kind === "unreachable") {
-      resultHost.appendChild(txt("p", "goal-msg", `Even ${money(res.cap)}/month extra wouldn't clear these debts by ${dateLabel} — that date may be too soon. Try a later month.`));
+      resultHost.appendChild(txt("p", "goal-msg", `Even ${money(res.cap)}/month extra wouldn't clear these debts by ${dateLabel}. That date may be too soon. Try a later month.`));
       return;
     }
     // kind === "found"
@@ -3109,7 +3107,7 @@ function neverPaysOffMessage(activeDebts, strategy) {
   if (need && need > 0) {
     const sim = simulateStrategy(activeDebts, strategy, need);
     if (!sim.neverPaysOff) {
-      return `${base} Putting about ${money(need)}/month extra toward them would clear them — debt-free by ${formatDate(addMonths(new Date(), sim.months))}.`;
+      return `${base} Putting about ${money(need)}/month extra toward them would clear them. Debt-free by ${formatDate(addMonths(new Date(), sim.months))}.`;
     }
   }
   return `${base} Increase your minimums or add an extra payment.`;
@@ -3128,7 +3126,7 @@ function buildStudentLoanAdvisory() {
   box.appendChild(ic);
   const body = el("div", "sl-advisory-body");
   body.appendChild(txt("div", "sl-advisory-title", "A note on federal student loans"));
-  body.appendChild(txt("div", "sl-advisory-msg", "If any of these are federal student loans on an income-driven plan or headed for forgiveness (like PSLF), paying them off early may not help you — My Snowball assumes early payoff is always a win. Worth checking with your servicer before you prioritize them."));
+  body.appendChild(txt("div", "sl-advisory-msg", "If any of these are federal student loans on an income-driven plan or headed for forgiveness (like PSLF), paying them off early may not help you. My Snowball assumes early payoff is always a win. Worth checking with your servicer before you prioritize them."));
   box.appendChild(body);
   const dismiss = txt("button", "sl-advisory-dismiss", "Got it"); dismiss.type = "button";
   dismiss.onclick = () => { try { localStorage.setItem(SL_ADVISORY_KEY, "1"); } catch { /* private mode */ } buildApp(); };
@@ -3144,7 +3142,7 @@ function debtWarning(debt) {
   if (debt.balance > 0 && debt.minPayment > 0 && debt.minKind !== "percent") {
     const monthlyInterest = debt.balance * (debt.apr / 100 / 12);
     if (debt.minPayment < monthlyInterest) {
-      return warnBox(`This minimum won't cover the ${moneyPrecise(monthlyInterest)}/month interest — the balance will grow unless this debt gets extra payments.`);
+      return warnBox(`This minimum won't cover the ${moneyPrecise(monthlyInterest)}/month interest. The balance will grow unless this debt gets extra payments.`);
     }
   }
   return null;
@@ -3506,7 +3504,7 @@ function buildPromoCliffCard(activeDebts, strategy, extra) {
   const sim = simulateStrategy(activeDebts, strategy, extra, { trackPerDebt: true });
   const card = el("div", "panel promo-cliff-card");
   card.appendChild(txt("h3", null, "Promo-rate cliff guard"));
-  card.appendChild(txt("p", "hint", "Intro 0% / low rates expire. Here's whether each one clears in time — and what it takes to beat the cliff."));
+  card.appendChild(txt("p", "hint", "Intro 0% / low rates expire. Here's whether each one clears in time, and what it takes to beat the cliff."));
 
   promoDebts.forEach((d) => {
     const name = (d.name || "").trim() || "This debt";
@@ -3522,10 +3520,10 @@ function buildPromoCliffCard(activeDebts, strategy, extra) {
     if (cliff <= 0) {
       row.classList.add("pc-bad");
       row.appendChild(txt("div", "pc-name", name));
-      row.appendChild(txt("div", "pc-msg", `The intro rate has ended — about ${money(bal)} is now accruing ${postApr}%. Prioritize it.`));
+      row.appendChild(txt("div", "pc-msg", `The intro rate has ended. About ${money(bal)} is now accruing ${postApr}%. Prioritize it.`));
     } else if (atCliff <= 0.5) {
       row.classList.add("pc-good");
-      row.appendChild(txt("div", "pc-name", `${name} — on track ✓`));
+      row.appendChild(txt("div", "pc-name", `${name}, on track ✓`));
       row.appendChild(txt("div", "pc-msg", `You'll clear it before the ${postApr}% kicks in (${monthKeyLabel(d.promo.endMonth)}). Nice work.`));
     } else {
       row.classList.add("pc-bad");
@@ -3575,10 +3573,10 @@ function loadRewardPhoto(file) {
       if (w > max || h > max) { const s = max / Math.max(w, h); w = Math.round(w * s); h = Math.round(h * s); }
       const cv = document.createElement("canvas"); cv.width = w; cv.height = h;
       cv.getContext("2d").drawImage(img, 0, 0, w, h);
-      try { setRewardPhoto(cv.toDataURL("image/jpeg", 0.82)); } catch (e) { announce("That photo is too large to store on this device — try a smaller one.", true); return; }
+      try { setRewardPhoto(cv.toDataURL("image/jpeg", 0.82)); } catch (e) { announce("That photo is too large to store on this device. Try a smaller one.", true); return; }
       buildApp();
     };
-    img.onerror = () => announce("Couldn't read that image — try another.", true);
+    img.onerror = () => announce("Couldn't read that image. Try another.", true);
     img.src = reader.result;
   };
   reader.onerror = () => announce("Couldn't read that file.", true);
@@ -3608,10 +3606,10 @@ function buildRewardPhotoCard() {
   const card = el("div", "panel reward-card");
   card.appendChild(txt("h3", null, "Your why"));
   if (!isPro) {
-    card.appendChild(txt("p", "hint", "Pick a photo of what you're working toward — a trip, a paid-off home, your kid — and watch it reappear as your balances fall."));
+    card.appendChild(txt("p", "hint", "Pick a photo of what you're working toward (a trip, a paid-off home, your kid) and watch it reappear as your balances fall."));
     const teaser = el("div", "reward-teaser");
     teaser.appendChild(txt("span", "reward-teaser-emoji", "🖼️"));
-    teaser.appendChild(txt("span", "reward-teaser-text", "Unlocks with Pro — your photo never leaves your device."));
+    teaser.appendChild(txt("span", "reward-teaser-text", "Unlocks with Pro. Your photo never leaves your device."));
     card.appendChild(teaser);
     const btn = txt("button", "btn brand sm", "Unlock Pro"); btn.type = "button";
     btn.onclick = () => showProModal({ reason: "rewardPhoto" });
@@ -3621,7 +3619,7 @@ function buildRewardPhotoCard() {
   const photo = getRewardPhoto();
   const fileInput = () => { const i = el("input"); i.type = "file"; i.accept = "image/*"; i.style.display = "none"; i.onchange = () => { const f = i.files && i.files[0]; if (f) loadRewardPhoto(f); }; return i; };
   if (!photo) {
-    card.appendChild(txt("p", "hint", "Pick a photo of your goal — it reappears as you pay down, and never leaves this device."));
+    card.appendChild(txt("p", "hint", "Pick a photo of your goal. It reappears as you pay down, and never leaves this device."));
     const inp = fileInput();
     const pick = txt("button", "btn brand sm", "Choose a photo"); pick.type = "button";
     pick.onclick = () => inp.click();
@@ -3635,7 +3633,7 @@ function buildRewardPhotoCard() {
   canvas.setAttribute("aria-label", `Your goal photo, ${Math.round(frac * 100)}% revealed as you pay down.`);
   wrap.appendChild(canvas);
   card.appendChild(wrap);
-  card.appendChild(txt("p", "reward-progress", frac >= 0.999 ? "Fully revealed — you did it. 🎉" : `${Math.round(frac * 100)}% revealed — every payment brings it back.`));
+  card.appendChild(txt("p", "reward-progress", frac >= 0.999 ? "Fully revealed. You did it. 🎉" : `${Math.round(frac * 100)}% revealed. Every payment brings it back.`));
   const acts = el("div", "reward-acts");
   const inp = fileInput();
   const change = txt("button", "reward-link", "Change photo"); change.type = "button"; change.onclick = () => inp.click();
@@ -3675,7 +3673,7 @@ function buildYearInReviewCard(active, plan) {
   card.appendChild(txt("h3", null, "Your payoff story"));
 
   if (!isPro) {
-    card.appendChild(txt("p", "hint", "Unlock Pro to see your full progress story — months logged, your longest streak, every debt you've conquered, and the monthly cash you've freed up."));
+    card.appendChild(txt("p", "hint", "Unlock Pro to see your full progress story: months logged, your longest streak, every debt you've conquered, and the monthly cash you've freed up."));
     const btn = txt("button", "btn sm", "Unlock Pro to see your story"); btn.type = "button";
     btn.onclick = () => gateProAction(btn, { reason: "yearInReview" }, () => buildApp());
     card.appendChild(btn);
@@ -3696,7 +3694,7 @@ function buildYearInReviewCard(active, plan) {
   card.appendChild(stats);
 
   if (plan && !plan.neverPaysOff && plan.months > 0) {
-    card.appendChild(txt("p", "yir-close", `Keep it up — at your current plan, you're debt-free by ${formatDate(addMonths(new Date(), plan.months))}.`));
+    card.appendChild(txt("p", "yir-close", `Keep it up. At your current plan, you're debt-free by ${formatDate(addMonths(new Date(), plan.months))}.`));
   } else if (conquered > 0) {
     card.appendChild(txt("p", "yir-close", "Look how far you've come. Every one of these was a win worth keeping."));
   }
@@ -3773,7 +3771,7 @@ function buildSnowpackCard(active, plan) {
   card.appendChild(head);
 
   if (total === 0) {
-    card.appendChild(txt("p", "hint", "Log what you pay each month — your balances update, your debt-free date re-projects, and you build a private record of real progress. It all stays on your device."));
+    card.appendChild(txt("p", "hint", "Log what you pay each month. Your balances update, your debt-free date re-projects, and you build a private record of real progress. It all stays on your device."));
   } else {
     if (remaining != null) {
       const totalJourney = total + remaining;
@@ -3814,7 +3812,7 @@ function buildSnowpackCard(active, plan) {
     const rec = recommendedThisMonth(active, state.strategy, extra);
     const panel = el("div", "snowpack-log");
     panel.appendChild(txt("div", "snowpack-log-title", `Log ${monthKeyLabel(thisMonth)}'s payments`));
-    panel.appendChild(txt("p", "snowpack-log-hint", "We filled in your plan — tweak any that differed, then confirm. Your balances update to match reality."));
+    panel.appendChild(txt("p", "snowpack-log-hint", "We filled in your plan. Tweak any that differed, then confirm. Your balances update to match reality."));
     const inputs = [];
     active.forEach((d) => {
       const row = el("div", "snowpack-log-row");
@@ -3861,7 +3859,7 @@ function buildSnowpackCard(active, plan) {
       const fname = focus ? ((focus.name || "").trim() || "your focus debt") : "your focus debt";
       const sf = el("div", "snowflake-panel");
       sf.appendChild(txt("div", "snowflake-title", "❄️ Log a snowflake"));
-      sf.appendChild(txt("p", "snowflake-hint", `Found money — a rebate, cashback, something you sold? Drop it on ${fname} and watch your date move.`));
+      sf.appendChild(txt("p", "snowflake-hint", `Found money. A rebate, cashback, something you sold? Drop it on ${fname} and watch your date move.`));
       const row = el("div", "snowflake-row");
       const inWrap = el("div", "snowflake-inwrap");
       inWrap.appendChild(txt("span", "snowflake-dollar", "$"));
@@ -3908,7 +3906,7 @@ function buildCascadeCard(activeDebts, strategy, extra, primary) {
 
   const card = el("div", "panel cascade-card");
   card.appendChild(txt("h3", null, "Watch your snowball roll"));
-  card.appendChild(txt("p", "hint", "Scrub through time and watch each debt fall — then its payment rolls onto the next, faster and faster. That's the snowball."));
+  card.appendChild(txt("p", "hint", "Scrub through time and watch each debt fall. Then its payment rolls onto the next, faster and faster. That's the snowball."));
 
   const bars = el("div", "cascade-bars");
   const barEls = {};
@@ -3950,7 +3948,7 @@ function buildCascadeCard(activeDebts, strategy, extra, primary) {
       be.row.classList.toggle("cascade-done", done);
     });
     const date = formatDate(addMonths(new Date(), m));
-    monthLabel.textContent = m === 0 ? `Today — ${money(totalRem)} to go` : `Month ${m} · ${date} — ${money(totalRem)} to go`;
+    monthLabel.textContent = m === 0 ? `Today, ${money(totalRem)} to go` : `Month ${m} · ${date}, ${money(totalRem)} to go`;
   }
   slider.oninput = () => renderAt(parseInt(slider.value, 10) || 0);
 
@@ -3992,7 +3990,7 @@ function buildInterestClock(active) {
   fig.appendChild(txt("span", "ic-unit", "today"));
   card.appendChild(fig);
   card.appendChild(txt("div", "ic-sub", `About ${moneyPrecise(nightly)} while you sleep tonight.`));
-  card.appendChild(txt("div", "ic-note", "At today's balances — every payment you make shrinks this."));
+  card.appendChild(txt("div", "ic-note", "At today's balances, every payment you make shrinks this."));
   // Per-debt breakdown — which card is bleeding you fastest (only when more than
   // one debt actually accrues interest, so a single debt doesn't just restate it).
   const perDebt = active
@@ -4043,7 +4041,7 @@ function buildTrapXray(active, strategy, extra) {
     return r;
   };
   rows.appendChild(row("tx-bad", "Paying only minimums", minsNeverPays
-    ? `Over ${CAP_MONTHS / 12} years — never clears`
+    ? `Over ${CAP_MONTHS / 12} years, never clears`
     : `${monthsLabel(minsMonths)} · ${money(minsInterest)} interest`));
   rows.appendChild(row("tx-good", "Your plan", `${monthsLabel(plan.months)} · ${money(plan.totalInterest)} interest`));
   card.appendChild(rows);
@@ -4051,7 +4049,7 @@ function buildTrapXray(active, strategy, extra) {
   if (minsNeverPays) {
     delta.appendChild(document.createTextNode("On minimums alone this never clears in "));
     const b = el("b"); b.textContent = `${CAP_MONTHS / 12} years`; delta.appendChild(b);
-    delta.appendChild(document.createTextNode(` — your plan clears it in ${monthsLabel(plan.months)}.`));
+    delta.appendChild(document.createTextNode(`. Your plan clears it in ${monthsLabel(plan.months)}.`));
   } else {
     const parts = [];
     if (interestSaved >= 1) parts.push(money(interestSaved) + " in interest");
@@ -4062,7 +4060,7 @@ function buildTrapXray(active, strategy, extra) {
   }
   card.appendChild(delta);
   if (active.some((d) => d.minKind === "percent")) {
-    card.appendChild(txt("p", "tx-note", "Assumes your minimum shrinks as the balance falls — the way real credit-card minimums work."));
+    card.appendChild(txt("p", "tx-note", "Assumes your minimum shrinks as the balance falls, the way real credit-card minimums work."));
   }
   return card;
 }
@@ -4093,8 +4091,8 @@ function buildMotivationCard(primary) {
   body.appendChild(txt("p", "motiv-sub", "Stay consistent and watch your snowball grow."));
   // Non-pushy, warm. Uses the honest plan length; falls back gently if unknown.
   const line = primary && !primary.neverPaysOff && primary.months > 0
-    ? `You've got a clear path to the summit — ${monthsLabel(primary.months)} of steady steps and you're there. Take it one payment at a time.`
-    : "Every debt you map out is a step toward the summit. Take it one payment at a time — you've got this.";
+    ? `You've got a clear path to the summit: ${monthsLabel(primary.months)} of steady steps and you're there. Take it one payment at a time.`
+    : "Every debt you map out is a step toward the summit. Take it one payment at a time. You've got this.";
   body.appendChild(txt("p", "motiv-text", line));
   card.append(art, body);
   return card;
@@ -4114,13 +4112,13 @@ function buildMotivationCard(primary) {
 function strategyPickerHint(chosen, primary, other) {
   let msg;
   if (chosen === "custom") {
-    if (primary.neverPaysOff) msg = "Your own payoff order — add balances and minimums to see what it costs.";
+    if (primary.neverPaysOff) msg = "Your own payoff order. Add balances and minimums to see what it costs.";
     else if (other.neverPaysOff) msg = "Your own payoff order, worked out on this device.";
     else {
       const diff = primary.totalInterest - other.totalInterest; // your order minus Avalanche
       msg = diff > 0.5
-        ? `Your own order — Avalanche would save about ${money(diff)} in interest, but this order is yours.`
-        : "Your own order — as cheap as Avalanche for your debts. Nice.";
+        ? `Your own order. Avalanche would save about ${money(diff)} in interest, but this order is yours.`
+        : "Your own order, as cheap as Avalanche for your debts. Nice.";
     }
     const p = txt("p", "hint picker-hint", msg);
     p.setAttribute("role", "status"); p.setAttribute("aria-live", "polite");
@@ -4156,7 +4154,7 @@ function buildCustomOrderList(active) {
   const ids = inOrder.map((d) => d.id);
   const wrap = el("div", "customorder");
   wrap.appendChild(txt("div", "customorder-title", "Your payoff order"));
-  wrap.appendChild(txt("p", "customorder-hint", "Nudge debts up or down — every extra dollar goes to the top one first."));
+  wrap.appendChild(txt("p", "customorder-hint", "Nudge debts up or down. Every extra dollar goes to the top one first."));
   inOrder.forEach((d, i) => {
     const rowEl = el("div", "customorder-row");
     rowEl.appendChild(txt("span", "customorder-pos", String(i + 1)));
@@ -4190,7 +4188,7 @@ function buildCustomCompareCard(mine, avalanche) {
     d.appendChild(txt("span", "compare-stat-val", plan.neverPaysOff ? "Not within " + (CAP_MONTHS / 12) + " yrs" : formatDate(addMonths(new Date(), plan.months))));
     const i = el("div", "compare-stat");
     i.appendChild(txt("span", "compare-stat-label", "Total interest"));
-    i.appendChild(txt("span", "compare-stat-val", plan.neverPaysOff ? "—" : money(plan.totalInterest)));
+    i.appendChild(txt("span", "compare-stat-val", plan.neverPaysOff ? "…" : money(plan.totalInterest)));
     stats.append(d, i); row.appendChild(stats);
     return row;
   };
@@ -4201,7 +4199,7 @@ function buildCustomCompareCard(mine, avalanche) {
   else {
     const diff = mine.totalInterest - avalanche.totalInterest;
     takeaway = diff > 0.5
-      ? `Your order costs about ${money(diff)} more in interest than Avalanche — a fair price for paying them off your way.`
+      ? `Your order costs about ${money(diff)} more in interest than Avalanche. A fair price for paying them off your way.`
       : "Your order is as cheap as Avalanche for your debts.";
   }
   panel.appendChild(txt("p", "hint compare-takeaway", takeaway));
@@ -4231,7 +4229,7 @@ function buildStrategyCompareCard(chosen, primary, other) {
     dateStat.appendChild(txt("span", "compare-stat-val", plan.neverPaysOff ? "Not within " + (CAP_MONTHS / 12) + " yrs" : formatDate(addMonths(new Date(), plan.months))));
     const intStat = el("div", "compare-stat");
     intStat.appendChild(txt("span", "compare-stat-label", "Total interest"));
-    intStat.appendChild(txt("span", "compare-stat-val", plan.neverPaysOff ? "—" : money(plan.totalInterest)));
+    intStat.appendChild(txt("span", "compare-stat-val", plan.neverPaysOff ? "…" : money(plan.totalInterest)));
     stats.append(dateStat, intStat);
     row.appendChild(stats);
     return row;
@@ -4243,13 +4241,13 @@ function buildStrategyCompareCard(chosen, primary, other) {
   // Plain-language takeaway. Only meaningful when both strategies resolve.
   let takeaway;
   if (snowball.neverPaysOff || avalanche.neverPaysOff) {
-    takeaway = "At this payment level, the plan doesn't fully pay off within " + (CAP_MONTHS / 12) + " years — add an extra payment to compare finish lines.";
+    takeaway = "At this payment level, the plan doesn't fully pay off within " + (CAP_MONTHS / 12) + " years. Add an extra payment to compare finish lines.";
   } else {
     const interestDiff = primary.totalInterest - other.totalInterest; // primary minus other
     const monthDiff = primary.months - other.months;
     const otherName = chosen === "snowball" ? "Avalanche" : "Snowball";
     if (Math.abs(interestDiff) < 0.5 && monthDiff === 0) {
-      takeaway = "For your debts, both strategies finish on the same date for the same interest — pick whichever keeps you motivated.";
+      takeaway = "For your debts, both strategies finish on the same date for the same interest. Pick whichever keeps you motivated.";
     } else if (interestDiff > 0.5 || (interestDiff >= -0.5 && monthDiff > 0)) {
       // The OTHER strategy is cheaper and/or faster than your current pick.
       const bits = [];
@@ -4266,7 +4264,7 @@ function buildStrategyCompareCard(chosen, primary, other) {
           : "Snowball clears your smallest debt first for an early win, at no real extra interest cost.";
       } else {
         takeaway = extraCost > 0.5
-          ? `Avalanche costs about ${money(extraCost)} more here — Snowball would be cheaper for your debts.`
+          ? `Avalanche costs about ${money(extraCost)} more here. Snowball would be cheaper for your debts.`
           : "Both strategies cost about the same in interest for your debts.";
       }
     }
@@ -4279,7 +4277,7 @@ function buildStrategyCompareCard(chosen, primary, other) {
   // pays it all off — even though Avalanche saves more on paper.
   if (!snowball.neverPaysOff && !avalanche.neverPaysOff) {
     panel.appendChild(txt("p", "hint compare-research",
-      "Studies of real payoffs find people are likelier to finish when they clear small balances first — so the method you'll actually stick with usually beats the one that's a little cheaper on paper."));
+      "Studies of real payoffs find people are likelier to finish when they clear small balances first, so the method you'll actually stick with usually beats the one that's a little cheaper on paper."));
   }
   return panel;
 }
@@ -4317,7 +4315,7 @@ function buildCountdownLine(primary) {
   lead.appendChild(document.createTextNode("You'll be debt-free in "));
   lead.appendChild(txt("strong", "countdown-dur", human));
   body.appendChild(lead);
-  body.appendChild(txt("p", "countdown-days", `That's about ${days.toLocaleString("en-US")} ${dayWord} from today — you've got this.`));
+  body.appendChild(txt("p", "countdown-days", `That's about ${days.toLocaleString("en-US")} ${dayWord} from today. You've got this.`));
   line.appendChild(body);
   return line;
 }
@@ -4355,7 +4353,7 @@ function buildMilestoneTimeline(activeDebts, primary) {
   done.appendChild(flag);
   const doneBody = el("div", "timeline-body");
   doneBody.appendChild(txt("span", "timeline-name", "Debt-free"));
-  doneBody.appendChild(txt("span", "timeline-when", primary.neverPaysOff ? "Keep going — raise a payment to reach it" : formatDate(addMonths(new Date(), primary.months))));
+  doneBody.appendChild(txt("span", "timeline-when", primary.neverPaysOff ? "Keep going. Raise a payment to reach it" : formatDate(addMonths(new Date(), primary.months))));
   done.appendChild(doneBody);
   list.appendChild(done);
 
@@ -4387,11 +4385,11 @@ function buildResults(mode) {
       // dashes so the layout reads the same, mirroring the app's existing
       // "add at least one debt" messaging below.
       const emptySummary = el("div", "summary-grid is-empty");
-      emptySummary.appendChild(summaryTile("brand", "debt", "—", "Total debt"));
-      emptySummary.appendChild(summaryTile("violet", "apr", "—", "Average APR"));
-      emptySummary.appendChild(summaryTile("green", "date", "—", "Debt-free date"));
-      emptySummary.appendChild(summaryTile("amber", "pay", "—", "Monthly payment"));
-      emptySummary.appendChild(summaryTile("amber", "interest", "—", "Total interest"));
+      emptySummary.appendChild(summaryTile("brand", "debt", "…", "Total debt"));
+      emptySummary.appendChild(summaryTile("violet", "apr", "…", "Average APR"));
+      emptySummary.appendChild(summaryTile("green", "date", "…", "Debt-free date"));
+      emptySummary.appendChild(summaryTile("amber", "pay", "…", "Monthly payment"));
+      emptySummary.appendChild(summaryTile("amber", "interest", "…", "Total interest"));
       empty.appendChild(emptySummary);
       empty.appendChild(emptyStateBlock(
         "Your plan builds itself here",
@@ -4428,7 +4426,7 @@ function buildResults(mode) {
   const totalMinPay = activeDebts.reduce((s, d) => s + d.minPayment, 0);
   const extraPay = safeNumber(state.extraPayment, { min: 0, max: MAX_MONEY });
   const monthlyPay = totalMinPay + extraPay;
-  const summaryDateStr = primary.neverPaysOff ? "—" : formatDate(addMonths(new Date(), primary.months));
+  const summaryDateStr = primary.neverPaysOff ? "…" : formatDate(addMonths(new Date(), primary.months));
   const summary = el("div", "summary-grid");
   summary.appendChild(summaryTile("brand", "debt", money(totalDebt), "Total debt"));
   summary.appendChild(summaryTile("violet", "apr", weightedApr.toFixed(2) + "%", "Average APR"));
@@ -4437,7 +4435,7 @@ function buildResults(mode) {
   // Total interest is the ONE summary figure that differs between Snowball and
   // Avalanche — surfacing it here (next to the strategy picker on the Plan view)
   // is what makes toggling the strategy visibly change a number.
-  summary.appendChild(summaryTile("amber", "interest", primary.neverPaysOff ? "—" : money(primary.totalInterest), "Total interest"));
+  summary.appendChild(summaryTile("amber", "interest", primary.neverPaysOff ? "…" : money(primary.totalInterest), "Total interest"));
 
   // Summary stat tiles live on the Plan (at-a-glance) view.
   if (wantSummary) {
@@ -4613,7 +4611,7 @@ function buildResults(mode) {
         toDebtPct,
         toDebtPct + "%",
         "to your debt",
-        `Only ${money(primary.totalInterest)} (${interestPct}%) is interest — the rest pays down what you owe. Add extra to shrink it further.`,
+        `Only ${money(primary.totalInterest)} (${interestPct}%) is interest. The rest pays down what you owe. Add extra to shrink it further.`,
         `Where your money goes: ${toDebtPct} percent of your total payoff reduces your debt; ${interestPct} percent (${money(primary.totalInterest)}) is interest.`
       ));
       card.appendChild(ringPanel);
@@ -4932,7 +4930,7 @@ async function downloadIcs(text, filename) {
 function buildCalendarExportCard(activeDebts, plan) {
   const card = el("div", "modeler-card");
   card.appendChild(txt("h4", "modeler-title", "Add your payoff plan to your calendar"));
-  card.appendChild(txt("p", "hint", "Download an .ics file with an all-day reminder for each debt's payoff month and your debt-free date. Import it into any calendar app — nothing leaves your device."));
+  card.appendChild(txt("p", "hint", "Download an .ics file with an all-day reminder for each debt's payoff month and your debt-free date. Import it into any calendar app. Nothing leaves your device."));
 
   const hasMilestones = !plan.neverPaysOff && Object.keys(plan.payoffMonth).length > 0;
   const row = el("div", "modeler-actions");
@@ -4968,7 +4966,7 @@ function buildCalendarExportCard(activeDebts, plan) {
 function buildBiweeklyCard(activeDebts, base, monthlyPay) {
   const card = el("div", "modeler-card");
   card.appendChild(txt("h4", "modeler-title", "Try paying biweekly"));
-  card.appendChild(txt("p", "hint", "Paying half your monthly amount every two weeks adds up to one extra monthly payment a year. See what that does — biweekly ≈ one extra monthly payment a year."));
+  card.appendChild(txt("p", "hint", "Paying half your monthly amount every two weeks adds up to one extra monthly payment a year. See what that does. Biweekly ≈ one extra monthly payment a year."));
 
   const readout = el("div", "modeler-readout");
   readout.setAttribute("role", "status");
@@ -5084,7 +5082,7 @@ function simulateWithWindfall(debts, strategy, extraPayment, lumpSum, applyMonth
 function buildPurchaseCostCard(activeDebts, strategy, extra, base) {
   const card = el("div", "modeler-card");
   card.appendChild(txt("h4", "modeler-title", "What this purchase really costs"));
-  card.appendChild(txt("p", "hint", "Tempted to put something on a card? See what it truly costs once interest is added — and how far it pushes your debt-free date. Just a preview; nothing is saved."));
+  card.appendChild(txt("p", "hint", "Tempted to put something on a card? See what it truly costs once interest is added, and how far it pushes your debt-free date. Just a preview; nothing is saved."));
 
   const grid = el("div", "modeler-inputs");
   const amtWrap = el("div", "field");
@@ -5129,10 +5127,10 @@ function buildPurchaseCostCard(activeDebts, strategy, extra, base) {
     const b1 = el("b"); b1.textContent = money(amount); p.appendChild(b1);
     p.appendChild(document.createTextNode(" really costs you "));
     const b2 = el("b"); b2.textContent = money(trueCost); p.appendChild(b2);
-    p.appendChild(document.createTextNode(` — ${money(extraInterest)} of it is extra interest`));
+    p.appendChild(document.createTextNode(` (${money(extraInterest)} of it is extra interest)`));
     p.appendChild(document.createTextNode(delay >= 1 ? `, and pushes your debt-free date back about ${monthsLabel(delay)}.` : "."));
     readout.appendChild(p);
-    readout.appendChild(txt("p", "hint", "No judgment — just the trade, so it's your call with eyes open."));
+    readout.appendChild(txt("p", "hint", "No judgment, just the trade, so it's your call with eyes open."));
   };
   rowa.appendChild(btn); rowa.appendChild(readout);
   card.appendChild(rowa);
@@ -5147,7 +5145,7 @@ function buildPurchaseCostCard(activeDebts, strategy, extra, base) {
 function buildRoughMonthCard(activeDebts, strategy, extra, base) {
   const card = el("div", "modeler-card");
   card.appendChild(txt("h4", "modeler-title", "Tight month? See what happens"));
-  card.appendChild(txt("p", "hint", "Life happens. If you can only pay part of your plan this one month, see the real impact — it's usually smaller than the stress. Nothing is saved."));
+  card.appendChild(txt("p", "hint", "Life happens. If you can only pay part of your plan this one month, see the real impact. It's usually smaller than the stress. Nothing is saved."));
   const usualBudget = extra + activeDebts.reduce((s, d) => s + d.minPayment, 0);
   const minsOnly = activeDebts.reduce((s, d) => s + d.minPayment, 0);
 
@@ -5172,7 +5170,7 @@ function buildRoughMonthCard(activeDebts, strategy, extra, base) {
     const canPay = safeNumber(amtInput.value, { min: 0, max: MAX_MONEY });
     readout.innerHTML = "";
     if (canPay <= 0) { readout.appendChild(txt("p", "hint", "Enter what you can pay this month.")); return; }
-    if (canPay >= usualBudget) { readout.appendChild(txt("p", "modeler-result", "That's your full plan — you're right on track this month. 💪")); return; }
+    if (canPay >= usualBudget) { readout.appendChild(txt("p", "modeler-result", "That's your full plan. You're right on track this month. 💪")); return; }
     if (base.neverPaysOff) { readout.appendChild(txt("p", "hint", "Add an extra payment first so we can compare.")); return; }
     const rough = simulateStrategy(activeDebts, strategy, extra, { firstMonthBudget: canPay });
     const delayMonths = Math.max(0, rough.months - base.months);
@@ -5184,13 +5182,13 @@ function buildRoughMonthCard(activeDebts, strategy, extra, base) {
     const b1 = el("b"); b1.textContent = money(canPay); p.appendChild(b1);
     p.appendChild(document.createTextNode(" this month "));
     if (delayMonths < 1 && extraInterest < 1) {
-      p.appendChild(document.createTextNode("barely moves your plan — you're fine. Get back to it next month."));
+      p.appendChild(document.createTextNode("barely moves your plan. You're fine. Get back to it next month."));
     } else {
       p.appendChild(document.createTextNode("adds about "));
       const b2 = el("b"); b2.textContent = money(extraInterest); p.appendChild(b2);
       p.appendChild(document.createTextNode(" in interest"));
       if (delayMonths >= 1) p.appendChild(document.createTextNode(` and ${monthsLabel(delayMonths)} to your date`));
-      p.appendChild(document.createTextNode(". You're okay — one month won't undo your progress."));
+      p.appendChild(document.createTextNode(". You're okay. One month won't undo your progress."));
     }
     readout.appendChild(p);
     // Blunt-but-kind heads-up when this month's payment can't cover the interest.
@@ -5207,7 +5205,7 @@ function buildRoughMonthCard(activeDebts, strategy, extra, base) {
 function buildWindfallCard(activeDebts, base) {
   const card = el("div", "modeler-card");
   card.appendChild(txt("h4", "modeler-title", "Model a one-time windfall"));
-  card.appendChild(txt("p", "hint", "Expecting a bonus, tax refund, or gift? See how a single extra payment in one month moves your debt-free date. This is a preview — nothing is saved."));
+  card.appendChild(txt("p", "hint", "Expecting a bonus, tax refund, or gift? See how a single extra payment in one month moves your debt-free date. This is a preview. Nothing is saved."));
 
   const grid = el("div", "modeler-inputs");
 
@@ -5314,7 +5312,7 @@ function simulateRefinance(activeDebts, strategy, extraPayment, debtId, newApr, 
 function buildRefinanceCard(activeDebts, base) {
   const card = el("div", "modeler-card");
   card.appendChild(txt("h4", "modeler-title", "Model a refinance or balance transfer"));
-  card.appendChild(txt("p", "hint", "Thinking of moving a debt to a lower rate? Pick the debt, enter the new APR and any transfer fee, and see whether it actually saves money after the fee. This is a preview — nothing is saved."));
+  card.appendChild(txt("p", "hint", "Thinking of moving a debt to a lower rate? Pick the debt, enter the new APR and any transfer fee, and see whether it actually saves money after the fee. This is a preview. Nothing is saved."));
 
   const grid = el("div", "modeler-inputs");
 
@@ -5331,7 +5329,7 @@ function buildRefinanceCard(activeDebts, base) {
     const opt = el("option");
     opt.value = d.id;
     // textContent — debt name is user data, never innerHTML.
-    opt.textContent = `${d.name.trim() || "Untitled debt"} — ${money(d.balance)} @ ${d.apr}%`;
+    opt.textContent = `${d.name.trim() || "Untitled debt"}, ${money(d.balance)} @ ${d.apr}%`;
     debtSelect.appendChild(opt);
   });
   debtWrap.appendChild(debtSelect);
@@ -5432,9 +5430,9 @@ function buildRefinanceCard(activeDebts, base) {
       readout.appendChild(txt("p", "modeler-save", `Refinancing ${debtName} to ${newApr}%${feeNote} saves you about ${money(interestSaved)} in interest.`));
     } else if (interestSaved < -0.5) {
       // Net negative — the fee (and/or a not-actually-lower rate) costs more.
-      readout.appendChild(txt("p", "modeler-save muted", `The ${feeAmount > 0.5 ? money(feeAmount) + " fee" : "new rate"} outweighs the savings here — refinancing ${debtName} would cost about ${money(-interestSaved)} more in interest.`));
+      readout.appendChild(txt("p", "modeler-save muted", `The ${feeAmount > 0.5 ? money(feeAmount) + " fee" : "new rate"} outweighs the savings here. Refinancing ${debtName} would cost about ${money(-interestSaved)} more in interest.`));
     } else {
-      readout.appendChild(txt("p", "modeler-save muted", `Refinancing ${debtName} to ${newApr}%${feeNote} barely changes what you pay — about the same either way.`));
+      readout.appendChild(txt("p", "modeler-save muted", `Refinancing ${debtName} to ${newApr}%${feeNote} barely changes what you pay, about the same either way.`));
     }
   };
 
@@ -5659,12 +5657,12 @@ if (IS_NATIVE) {
     catch (e) { console.error("Snowball: restore threw", e); res = { ok: false }; }
     footerRestore.disabled = false; footerRestore.textContent = prev;
     if (res && res.ok) {
-      announce("Welcome back — Pro is unlocked on this device.", false);
-      showToast("Welcome back — Pro is unlocked on this device.");
+      announce("Welcome back. Pro is unlocked on this device.", false);
+      showToast("Welcome back. Pro is unlocked on this device.");
       refreshAfterProChange();
       runPendingProIntent();
     } else {
-      showToast("No previous purchase found for this Apple Account. Bought on the web? Web and App Store purchases are separate — your code works in your browser.", null, null, 9000);
+      showToast("No previous purchase found for this Apple Account. Bought on the web? Web and App Store purchases are separate. Your code works in your browser.", null, null, 9000);
     }
   };
 } else {
@@ -5721,8 +5719,8 @@ try { maybeShowSaveNag(); } catch (e) {}
     try { res = await Billing.restoreWithCode(normalized); }
     catch (e) { res = { ok: false }; }
     if (res && res.ok) {
-      announce("Welcome back — Pro is unlocked on this device.", false);
-      showToast("Welcome back — Pro is unlocked on this device.");
+      announce("Welcome back. Pro is unlocked on this device.", false);
+      showToast("Welcome back. Pro is unlocked on this device.");
       refreshAfterProChange();
       runPendingProIntent();
     } else {
@@ -5756,7 +5754,7 @@ try { maybeShowSaveNag(); } catch (e) {}
       box.appendChild(txt("div", "restore-code-value", existing));
       modal.appendChild(box);
       modal.appendChild(txt("p", "hint",
-        "The link you opened restores a different code. Switching replaces the code saved on this device — if you haven't saved your license card, the current code can't be recovered here."));
+        "The link you opened restores a different code. Switching replaces the code saved on this device. If you haven't saved your license card, the current code can't be recovered here."));
     } else {
       modal.appendChild(txt("p", "hint",
         "Pro is already unlocked on this device, but no restore code has been saved here yet. The link you opened would move this device onto a different purchase, and this one would be lost. Keep this device's Pro and save a code for it from the Pro menu."));

@@ -1,7 +1,7 @@
 {
   "name": "Snowball — Private Debt Payoff Planner",
   "short_name": "Snowball",
-  "description": "Plan your debt-free date with the snowball or avalanche method, entirely in your browser. Your balances, rates, and payments never leave your device — no account, no subscription trap.",
+  "description": "Plan your debt-free date with the snowball or avalanche method, entirely in your browser. Your balances, rates, and payments never leave your device. No account needed.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
