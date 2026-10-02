@@ -1287,13 +1287,13 @@ function showAccessEndedNotice() {
   const bar = el("div", "save-nag access-ended"); bar.id = "saveNagBanner";
   // Say WHY it usually happens (a refund) and give the path out if it's a mistake —
   // "access ended" with no reason or contact reads as a broken "yours forever" promise.
-  bar.appendChild(txt("span", "save-nag-text", "Your Pro access has ended. This usually follows a refund. If it's unexpected, email " + SUPPORT_EMAIL + " and we'll sort it out. Everything you made is safe and still here, and every free feature keeps working. You're always welcome back."));
+  bar.appendChild(txt("span", "save-nag-text", "Your Pro access has ended. This usually follows a refund. If it's unexpected, email " + SUPPORT_EMAIL + " and we'll help you look into it. Everything you made is safe and still here, and every free feature keeps working. You're always welcome back."));
   const close = txt("button", "save-nag-close", "×"); close.type = "button";
   close.setAttribute("aria-label", "Dismiss");
   close.onclick = () => bar.remove();
   bar.appendChild(close);
   document.body.insertBefore(bar, document.body.firstChild);
-  announce("Your Pro access has ended. This usually follows a refund. If it's unexpected, email " + SUPPORT_EMAIL + " and we'll sort it out. Everything you made is safe and still here, and every free feature keeps working.", false);
+  announce("Your Pro access has ended. This usually follows a refund. If it's unexpected, email " + SUPPORT_EMAIL + " and we'll help you look into it. Everything you made is safe and still here, and every free feature keeps working.", false);
 }
 
 // ── Refund request (customer-initiated, request-only) ─────────────────────
@@ -1326,7 +1326,7 @@ function buildRefundBlock() {
   // Rebuild the href at click time so a code minted mid-session is included.
   link.addEventListener("click", () => { link.href = refundMailtoHref(); });
   wrap.appendChild(link);
-  wrap.appendChild(txt("p", "refund-note", "30-day money-back guarantee. Email us and a real person reviews it, no forms, no runaround. Once approved, your refund goes back to your original payment method and takes about 5 to 10 business days to appear on your statement."));
+  wrap.appendChild(txt("p", "refund-note", "30-day money-back guarantee. Email us and a real person reviews it, no forms, no runaround. Once approved, your refund goes back to your original payment method. Timing depends on the payment provider, card network, and your bank (Stripe states typically 5–10 business days)."));
   return wrap;
 }
 
@@ -1578,7 +1578,7 @@ function renderPurchaseError(msgHost, onRetry) {
   // Assertive announce for AT (mirrors the old showStatus("…","err") call).
   // "no charge was made just now" (not "nothing was charged"): scoped to THIS attempt — honest
   // even if an earlier attempt did charge.
-  announce("Something went wrong. If your card was charged, your Pro will unlock automatically on your next visit. Otherwise no charge was made just now. " + (IS_NATIVE ? "Your App Store receipt is the record of what was charged, if anything." : "You're covered by our 30-day money-back guarantee.") + " Still stuck? Email " + SUPPORT_EMAIL + (IS_NATIVE ? " with your App Store receipt and we'll sort it out." : " with your Stripe receipt and we'll sort it out."), true);
+  announce("Something went wrong. If your card was charged, your Pro will unlock automatically on your next visit. Otherwise no charge was made just now. " + (IS_NATIVE ? "Your App Store receipt is the record of what was charged, if anything." : "You're covered by our 30-day money-back guarantee.") + " Still stuck? Email " + SUPPORT_EMAIL + (IS_NATIVE ? " with your App Store receipt and we'll help you look into it." : " with your Stripe receipt and we'll help you look into it."), true);
 
   const box = el("div", "purchase-error");
   box.setAttribute("role", "alert");
@@ -1609,7 +1609,7 @@ function renderPurchaseError(msgHost, onRetry) {
   const mail = txt("a", "purchase-error-mail", SUPPORT_EMAIL);
   mail.href = "mailto:" + SUPPORT_EMAIL;
   support.appendChild(mail);
-  support.appendChild(document.createTextNode(IS_NATIVE ? " with your App Store receipt and we'll sort it out." : " with your Stripe receipt and we'll sort it out."));
+  support.appendChild(document.createTextNode(IS_NATIVE ? " with your App Store receipt and we'll help you look into it." : " with your Stripe receipt and we'll help you look into it."));
   box.appendChild(support);
 
   // Primary "Try again" — re-runs the SAME purchase flow the Unlock Pro button uses.
@@ -1718,7 +1718,7 @@ function showProModal(context) {
     // Name BOTH payment brands up front: the hosted checkout's own header says
     // "Secure checkout by RevenueCat", so pre-framing only Stripe made a third
     // name appear mid-payment. Now every name the buyer meets was announced here.
-    modal.appendChild(txt("p", "hint pro-reassure", "Secure checkout by Stripe (via RevenueCat). You'll enter an email for your receipt only. It's not an account, and we never see your card."));
+    modal.appendChild(txt("p", "hint pro-reassure", "Secure checkout by Stripe and RevenueCat. You'll enter an email for your receipt only. It's not an account, and we never see your card."));
     modal.appendChild(txt("p", "hint pro-reassure", "30-day money-back guarantee. Email " + SUPPORT_EMAIL + "."));
     // Statement descriptor: Snowball is part of the Eden Apps family, so the card
     // charge reads "EDEN APPS". Name it at the pay moment so a buyer isn't confused.
